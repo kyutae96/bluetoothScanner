@@ -31,6 +31,7 @@ class MainFragment : Fragment() {
         var bluetoothDataClass : BluetoothDataClass? = null
         var isScanning = MutableLiveData<Boolean>()
 
+
     }
     private val TAG = "MainFragment"
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,11 +44,11 @@ class MainFragment : Fragment() {
     ): View? {
         bind = FragmentMainBinding.inflate(inflater, container, false)
 
-
         return bind.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         isScanning.value = false
 
         isScanning.observe(requireActivity()){
@@ -65,14 +66,6 @@ class MainFragment : Fragment() {
                 bind.progressCircular.visibility = View.GONE
             }
         }
-
-//        bind.scanStartButton.setOnClickListener {
-//            devicesArr.clear()
-//            Utils.scanDevice(true)
-//        }
-//        bind.scanStopButton.setOnClickListener {
-//            Utils.scanDevice(false)
-//        }
 
         userAdapter = UserAdapter(requireContext(), devicesArr)
         userAdapter.notifyDataSetChanged()
@@ -106,11 +99,5 @@ class MainFragment : Fragment() {
             adapter = userAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         }
-
-
-
     }
-
-
-
 }

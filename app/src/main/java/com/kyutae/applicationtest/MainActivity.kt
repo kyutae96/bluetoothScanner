@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.kyutae.applicationtest.databinding.ActivityMainBinding
 import com.kyutae.applicationtest.dataclass.DataCenter
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,10 +39,11 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
 
         permissionCheck()
 
@@ -149,6 +151,8 @@ class MainActivity : AppCompatActivity() {
             // 이미 모든 권한이 있는 경우 처리할 작업을 여기에 추가
         }
 
+
+
     }
 
     override fun onDestroy() {
@@ -156,8 +160,18 @@ class MainActivity : AppCompatActivity() {
         DataCenter.serviceDel()
         Log.e(TAG, "$TAG  : onDestroy")
     }
-
-
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

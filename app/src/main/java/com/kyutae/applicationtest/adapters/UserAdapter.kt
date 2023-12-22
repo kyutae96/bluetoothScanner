@@ -53,7 +53,7 @@ class UserAdapter(
 
     @SuppressLint("MissingPermission")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.itemLinear.setBackgroundResource(R.drawable.border_user_item)
+        initBindViewHolder(holder)
         holder.NameTxt.text = mList[position].device.name ?: "N/A"
         holder.AddressTxt.text = mList[position].device.address
         holder.RssiTxt.text = mList[position].rssi.toString()
@@ -104,6 +104,18 @@ class UserAdapter(
             }
         }
 
+    }
+
+    fun initBindViewHolder(holder: ViewHolder){
+        holder.itemLinear.setBackgroundResource(R.drawable.border_user_item)
+        holder.NameTxt.text = null
+        holder.AddressTxt.text = null
+        holder.RssiTxt.text = null
+        holder.TypeTxt.text = null
+        holder.CompanyKeyTxt.text = null
+        holder.CompanyValueTxt.text = null
+        holder.UuidTxt.text = null
+        holder.DataTxt.text = null
     }
 
 
