@@ -90,7 +90,7 @@ class BLEController(
                     }
                     DataCenter.charcSet(characMap)
                     DataCenter.serviceSet(services)
-                    checkGattServices(gatt?.services)
+                    checkGattServices(gatt.services)
                     Log.i(TAG, "characMap : ${characMap}")
                     Log.i(TAG, "gatt.device.name : ${gatt.device.name}")
                     broadcastUpdate("Connected " + mBluetoothDevice?.name)
@@ -116,12 +116,12 @@ class BLEController(
 
             //토닥서비스 characteristic uuid 값
             val d0c0Characteristic = gattD0C0Service?.characteristics
-            gattD0C0Characteristic = gattD0C0Service?.characteristics!![0]?.uuid
+            gattD0C0Characteristic = gattD0C0Service?.characteristics?.get(0)?.uuid
 
 
             //토닥서비스 descriptor uuid 값
             gattD0C0Descriptor =
-                d0c0Characteristic!![0]?.service!!.characteristics[0].descriptors[0].uuid
+                d0c0Characteristic!![0].service!!.characteristics[0].descriptors[0].uuid
 
             //배터리 값 읽어오기
             gattBatteryServices =

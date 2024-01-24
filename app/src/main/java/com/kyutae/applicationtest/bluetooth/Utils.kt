@@ -31,7 +31,7 @@ object Utils {
     object : ScanCallback() {
         override fun onScanFailed(errorCode: Int) {
             super.onScanFailed(errorCode)
-            Log.d("scanCallback", "BLE Scan Failed : " + errorCode)
+            Log.d("scanCallback", "BLE Scan Failed : $errorCode")
         }
 
         @SuppressLint("MissingPermission")

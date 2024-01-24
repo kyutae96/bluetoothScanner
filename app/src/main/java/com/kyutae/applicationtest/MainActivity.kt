@@ -1,12 +1,22 @@
 package com.kyutae.applicationtest
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothManager
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
+import android.widget.Button
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -24,7 +34,9 @@ class MainActivity : AppCompatActivity() {
     private var bleGatt: BluetoothGatt? = null
     private val REQUEST_ENABLE_BT=1
     lateinit var PERMISSIONS: Array<String>
-
+    private val REQUEST_ALL_PERMISSION = 2
+    var bluetoothManager = Application.ApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    var bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
     companion object{
          const val TAG_SETTING = "setting_fragment"
          const val TAG_MAIN = "main_fragment"
@@ -32,34 +44,45 @@ class MainActivity : AppCompatActivity() {
          const val TAG_BABY = "baby_fragment"
     }
 
-//    companion object{
-//        var devicesArr = mutableListOf<ScanResult>()
-//        lateinit var userAdapter: UserAdapter
-//    }
-    private val TAG = "MainActivity"
+    private val TAG = this.javaClass.simpleName
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        permissionCheck()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-
-        permissionCheck()
-
-
         setFragment(TAG_MAIN, MainFragment())
 
+        //블루투스 이용 가능한지 체크하고 불가능 하면 끝낸다.
+        packageManager.takeIf {
+            it.missingSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
+        }?.also {
+            return@onCreate finishForNoBluetooth()
+        }
 
-//        navigationView.setOnItemSelectedListener { item ->
-//            when(item.itemId) {
-//                R.id.mainFragment -> setFragment(TAG_MAIN, MainFragment())
-//                R.id.logFragment -> setFragment(TAG_MY_PAGE, LogFragment())
-//                R.id.settingFragment -> setFragment(TAG_SETTING, SettingFragment())
-//            }
-//            true
-//        }
+        bluetoothAdapter ?: return finishForNoBluetooth()
+        if (bluetoothAdapter!!.isEnabled) {
+            return
+        }
 
+        //블루투스 꺼있음 -> 킨다 -> 실패하면 앱종료
+        val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+        try {
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode != RESULT_OK)
+                    finishForNoBluetooth()
+                else {
+                    val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
+                    startActivity(intent)
+//                    scanDevices2()
+                }
+            }.launch(enableBtIntent)
+        } catch (e: Exception) {
+            finishForNoBluetooth()
+            Log.e(TAG, "Exception : $e")
+            e.printStackTrace()
+        }
     }
 
 
@@ -152,26 +175,61 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
     }
 
     override fun onDestroy() {
         super.onDestroy()
         DataCenter.serviceDel()
+
         Log.e(TAG, "$TAG  : onDestroy")
     }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQUEST_ALL_PERMISSION -> {
+                Log.i("APP SINGING :", "APP SINGING CHECK START!")
+                Log.i("APP SINGING :", "CERTIFIED APP")
+                Log.i("APP SINGING :", "APP VERSION CHECK START!")
+                Log.i("APP VERSION : ", "1.0.0  >>  The Latest Version")
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
+                    startActivity(intent)
+                } else {
+                    finishForNoBluetooth()
+                }
+            }
+        }
+    }
+    private fun finishForNoBluetooth() {
+        val myLayout = layoutInflater.inflate(R.layout.dialog_bluetooth_access, null)
+
+        val builder = AlertDialog.Builder(this@MainActivity, R.style.MyDialogTheme).apply {
+            setView(myLayout)
+        }
+
+        val accessBtn = myLayout.findViewById<Button>(R.id.access_btn)
+        accessBtn.setOnClickListener {
+
+            try {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    .setData(Uri.parse("package:$packageName"));
+                startActivity(intent);
+            } catch (e: ActivityNotFoundException) {
+                e.printStackTrace();
+            }
+            finish()
+
+        }
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.show()
+    }
+
+    private fun PackageManager.missingSystemFeature(name: String): Boolean = !hasSystemFeature(name)
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
