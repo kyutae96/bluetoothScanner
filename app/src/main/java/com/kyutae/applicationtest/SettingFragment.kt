@@ -16,17 +16,21 @@ import com.kyutae.applicationtest.adapters.ServiceAdapter
 import com.kyutae.applicationtest.bluetooth.BLEController
 import com.kyutae.applicationtest.databinding.FragmentSettingBinding
 import com.kyutae.applicationtest.dataclass.DataCenter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class SettingFragment : Fragment() {
     lateinit var bind: FragmentSettingBinding
     private val TAG = "SettingFragment"
-    lateinit var serviceAdapter : ServiceAdapter
+    lateinit var serviceAdapter: ServiceAdapter
     lateinit var characteristicsAdapter: CharacteristicsAdapter
     lateinit var mContext: Context
-    var gattServices :  BluetoothGattService? = null
-    var gattBatteryServices :  BluetoothGattService? = null
-    var gattDeviceInfoServices :  BluetoothGattService? = null
+    var gattServices: BluetoothGattService? = null
+    var gattBatteryServices: BluetoothGattService? = null
+    var gattDeviceInfoServices: BluetoothGattService? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,34 +72,40 @@ class SettingFragment : Fragment() {
                 Log.e(TAG, "LIVEDATA TRUE")
                 Log.e(TAG, "$bleGatt")
                 if (bleGatt != null) {
-                    Log.e(TAG, "${DataCenter.serviceGet()}")
-                    if (DataCenter.serviceGet() != null){
-                        val listservice = DataCenter.serviceGet() as List<*>
-                        Log.e(TAG, "listservice : ${listservice}")
-                        for (i in listservice.indices){
-                            Log.e(TAG, "listservice$i : ${listservice[i]}")
-                        }
-                        serviceAdapter = ServiceAdapter(mContext, listservice)
-                        serviceAdapter.notifyDataSetChanged()
+                Log.e(TAG, "${DataCenter.serviceGet()}")
+                    CoroutineScope(Dispatchers.Main).launch {
+                        bind.progressBar.visibility = View.VISIBLE
+                        delay(5000L)
+                        bind.progressBar.visibility = View.GONE
+                        if (DataCenter.serviceGet() != null) {
+                            val listservice = DataCenter.serviceGet() as List<*>
+                            Log.e(TAG, "listservice : ${listservice}")
+                            for (i in listservice.indices) {
+                                Log.e(TAG, "listservice$i : ${listservice[i]}")
+                            }
+                            serviceAdapter = ServiceAdapter(mContext, listservice)
+                            serviceAdapter.notifyDataSetChanged()
 
-                        serviceAdapter.mListener = object : ServiceAdapter.OnItemClickListener {
-                            override fun onClick(view: View, position: Int) {
-                                if (bind.characteristicLinear.visibility == View.VISIBLE){
-                                    bind.characteristicLinear.visibility = View.GONE
-                                    gattServices = null
-                                }else{
-                                    onClickItem(listservice[position].toString(), position)
+                            serviceAdapter.mListener = object : ServiceAdapter.OnItemClickListener {
+                                override fun onClick(view: View, position: Int) {
+                                    if (bind.characteristicLinear.visibility == View.VISIBLE) {
+                                        bind.characteristicLinear.visibility = View.GONE
+                                        gattServices = null
+                                    } else {
+                                        onClickItem(listservice[position].toString(), position)
+                                    }
                                 }
                             }
-                        }
 
-                        bind.recyclerview.apply {
-                            adapter = serviceAdapter
-                            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                            bind.recyclerview.apply {
+                                adapter = serviceAdapter
+                                layoutManager =
+                                    LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                            }
+                            bind.serviceLinear.visibility = View.VISIBLE
+                        } else {
+                            bind.serviceLinear.visibility = View.GONE
                         }
-                        bind.serviceLinear.visibility = View.VISIBLE
-                    }else{
-                        bind.serviceLinear.visibility = View.GONE
                     }
                 }else{
                     bind.serviceLinear.visibility = View.GONE
@@ -105,32 +115,32 @@ class SettingFragment : Fragment() {
 
     }
 
-    private fun onClickItem(item: String, index: Int){
+    private fun onClickItem(item: String, index: Int) {
         val serviceUUID = UUID.fromString(item)
         gattServices = BluetoothGattService(serviceUUID, BluetoothGattService.SERVICE_TYPE_PRIMARY)
         val mapCharc = DataCenter.charcGet() as Map<*, *>
 
 
         Log.i(TAG, "mapCharc : ${mapCharc}")
-        if(gattServices!!.uuid.toString().lowercase().startsWith("0000180f")){
+        if (gattServices!!.uuid.toString().lowercase().startsWith("0000180f")) {
             gattBatteryServices = gattServices
 
 
             Log.i(TAG, "gattServices : ${gattServices!!.uuid}")
 //            Log.i(TAG, "gattServices charc  : ${gattBatteryCharacteristic}")
             Log.i(TAG, "gattbattery : ${gattBatteryServices!!.uuid}")
-        }else if (gattServices!!.uuid.toString().lowercase().startsWith("0000180a")){
+        } else if (gattServices!!.uuid.toString().lowercase().startsWith("0000180a")) {
             gattDeviceInfoServices = gattServices
             Log.i(TAG, "gattServices : ${gattServices!!.uuid}")
             Log.i(TAG, "gattDevice : ${gattDeviceInfoServices!!.uuid}")
-        }else{
+        } else {
             Log.i(TAG, "gattServices : ${gattServices!!.uuid}")
         }
         val characteristic = mapCharc[gattServices!!.uuid] as List<*>
 
-        if (characteristic.isEmpty()){
+        if (characteristic.isEmpty()) {
             bind.characteristicLinear.visibility = View.GONE
-        }else{
+        } else {
             bind.characteristicLinear.visibility = View.VISIBLE
         }
 

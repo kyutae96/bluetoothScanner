@@ -38,6 +38,7 @@ class BLEController(
     var characMap = mutableMapOf<UUID, ArrayList<String>>()
     companion object{
         val gattConnect = MutableLiveData<Boolean>()
+        val serviceGet = MutableLiveData<Boolean>()
     }
 
 
@@ -94,6 +95,7 @@ class BLEController(
                     Log.i(TAG, "characMap : ${characMap}")
                     Log.i(TAG, "gatt.device.name : ${gatt.device.name}")
                     broadcastUpdate("Connected " + mBluetoothDevice?.name)
+
                 }
 
                 else -> {
@@ -119,9 +121,9 @@ class BLEController(
             gattD0C0Characteristic = gattD0C0Service?.characteristics?.get(0)?.uuid
 
 
-            //토닥서비스 descriptor uuid 값
-            gattD0C0Descriptor =
-                d0c0Characteristic!![0].service!!.characteristics[0].descriptors[0].uuid
+//            //토닥서비스 descriptor uuid 값
+//            gattD0C0Descriptor =
+//                d0c0Characteristic!![0].service?.characteristics?.get(0)?.descriptors?.get(0)?.uuid
 
             //배터리 값 읽어오기
             gattBatteryServices =
@@ -129,11 +131,11 @@ class BLEController(
 
             //배터리 characteristic uuid 값
             val batteryCharacteristic = gattBatteryServices?.characteristics
-            gattBatteryCharacteristic = gattBatteryServices?.characteristics!![0]?.uuid
+            gattBatteryCharacteristic = gattBatteryServices?.characteristics?.get(0)?.uuid
 
             //배터리 descriptor uuid 값
             gattBatteryDescriptor =
-                batteryCharacteristic!![0]?.service!!.characteristics[0].descriptors[0].uuid
+                batteryCharacteristic?.get(0)?.service?.characteristics?.get(0)?.descriptors?.get(0)?.uuid
 
 
             //device info 값 읽어오기
@@ -142,7 +144,7 @@ class BLEController(
             }
 
 
-            Log.e(TAG, "gattD0C0Service UUID : ${gattD0C0Service!!.uuid}")
+//            Log.e(TAG, "gattD0C0Service UUID : ${gattD0C0Service!!.uuid}")
             Log.e(TAG, "gattBatteryCharacteristic : $gattBatteryCharacteristic")
 
 
