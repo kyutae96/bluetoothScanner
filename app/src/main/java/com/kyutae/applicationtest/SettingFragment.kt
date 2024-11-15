@@ -7,6 +7,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.kyutae.applicationtest.MainFragment.Companion.bleGatt
@@ -31,7 +33,7 @@ class SettingFragment : Fragment() {
     var gattServices: BluetoothGattService? = null
     var gattBatteryServices: BluetoothGattService? = null
     var gattDeviceInfoServices: BluetoothGattService? = null
-
+    private lateinit var callback: OnBackPressedCallback
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -55,6 +57,14 @@ class SettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                removeFragment()
+            }
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), callback)
+
         println("bluetoothDataClass : $bluetoothDataClass")
 
         bind.nameTxt.text = bluetoothDataClass?.deviceName ?: "N/A"
@@ -66,6 +76,10 @@ class SettingFragment : Fragment() {
         bind.serviceUuidTxt.text = bluetoothDataClass?.uuid ?: "N/A"
         bind.serviceDataTxt.text = bluetoothDataClass?.uuidValue ?: "N/A"
 
+
+        bind.backBtn.setOnClickListener {
+            removeFragment()
+        }
 
         BLEController.gattConnect.observe(requireActivity()) {
             if (it) {
@@ -161,5 +175,10 @@ class SettingFragment : Fragment() {
         DataCenter.charcDel()
     }
 
-
+    fun removeFragment() {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .remove(this)
+            .commit()
+        requireActivity().supportFragmentManager.popBackStack()
+    }
 }

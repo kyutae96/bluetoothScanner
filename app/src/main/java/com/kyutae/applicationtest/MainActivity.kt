@@ -52,7 +52,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setFragment(TAG_MAIN, MainFragment())
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.mainFrameLayout, MainFragment())
+                .commit()
+        }
+//        setFragment(TAG_MAIN, MainFragment())
 
         //블루투스 이용 가능한지 체크하고 불가능 하면 끝낸다.
         packageManager.takeIf {

@@ -12,8 +12,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_bluescan_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Applicationtest"
-        tools:targetApi="31">
+        android:theme="@style/Theme.Applicationtest">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-6001930991464725~1388238942"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true">

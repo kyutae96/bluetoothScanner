@@ -10,9 +10,9 @@ android {
     defaultConfig {
         applicationId = "com.kyutae.applicationtest"
         minSdk = 24
-        targetSdk = 33
-        versionCode = 2
-        versionName = "1.0"
+        targetSdk = 34
+        versionCode = 5
+        versionName = "1.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,7 +41,7 @@ android {
 }
 
 dependencies {
-
+    implementation("com.google.android.gms:play-services-ads:23.3.0")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")
