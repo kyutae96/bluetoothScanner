@@ -156,7 +156,7 @@ class MainFragment : Fragment() {
 
 
                     requireActivity().supportFragmentManager.beginTransaction()
-                        .replace(R.id.mainFrameLayout, SettingFragment())
+                        .add(R.id.mainFrameLayout, SettingFragment())
                         .commit()
                 }
 
