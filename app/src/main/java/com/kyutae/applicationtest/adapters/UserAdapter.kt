@@ -11,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.util.isNotEmpty
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.kyutae.applicationtest.R
 import com.kyutae.applicationtest.bluetooth.Utils
@@ -52,62 +53,80 @@ class UserAdapter(
 
     @SuppressLint("MissingPermission")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        initBindViewHolder(holder)
-        val device = mList[position]
+        onBindViewHolder(holder, position, mutableListOf())
+    }
 
-        // 장치 이름
-        holder.NameTxt.text = device.device.name ?: "Unknown Device"
+    @SuppressLint("MissingPermission")
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty()) {
+            // 전체 업데이트
+            initBindViewHolder(holder)
+            val device = mList[position]
 
-        // MAC 주소
-        holder.AddressTxt.text = device.device.address
+            // 장치 이름
+            holder.NameTxt.text = device.device.name ?: "Unknown Device"
 
-        // RSSI (신호 강도) - 색상으로 강도 표시
-        val rssi = device.rssi
-        holder.RssiTxt.text = "$rssi dBm"
-        holder.RssiTxt.setBackgroundColor(getRssiColor(rssi))
+            // MAC 주소
+            holder.AddressTxt.text = device.device.address
 
-        // 장치 타입 (간소화)
-        val deviceType = when(device.device.type){
-            BluetoothDevice.DEVICE_TYPE_LE -> "LE"
-            BluetoothDevice.DEVICE_TYPE_CLASSIC -> "Classic"
-            BluetoothDevice.DEVICE_TYPE_DUAL -> "Dual"
-            else -> "Unknown"
-        }
-        holder.TypeTxt.text = deviceType
+            // RSSI (신호 강도) - 색상으로 강도 표시
+            val rssi = device.rssi
+            holder.RssiTxt.text = "$rssi dBm"
+            holder.RssiTxt.setBackgroundColor(getRssiColor(rssi))
 
-        // 제조사 정보
-        val manufacturerSpecificData = device.scanRecord?.manufacturerSpecificData
-        if (manufacturerSpecificData != null && manufacturerSpecificData.isNotEmpty()) {
-            val manufacturerId = manufacturerSpecificData.keyAt(0)
-            val manufacturerData = manufacturerSpecificData.valueAt(0)
-            holder.CompanyKeyTxt.text = Utils.manufacureID(manufacturerId)
-            holder.CompanyValueTxt.text = Utils.bytesToHex(manufacturerData)
-            holder.DetailsLayout.visibility = View.VISIBLE
-        } else {
-            holder.CompanyKeyTxt.text = "Unknown"
-            holder.CompanyValueTxt.text = "N/A"
-            holder.DetailsLayout.visibility = View.GONE
-        }
+            // 장치 타입 (간소화)
+            val deviceType = when(device.device.type){
+                BluetoothDevice.DEVICE_TYPE_LE -> "LE"
+                BluetoothDevice.DEVICE_TYPE_CLASSIC -> "Classic"
+                BluetoothDevice.DEVICE_TYPE_DUAL -> "Dual"
+                else -> "Unknown"
+            }
+            holder.TypeTxt.text = deviceType
 
-        // Service UUID (숨김 처리, SettingFragment에서 사용)
-        val serviceUuids = device.scanRecord?.serviceUuids
-        if (!serviceUuids.isNullOrEmpty()) {
-            holder.UuidTxt.text = serviceUuids[0].toString()
-            val firstServiceUuid = serviceUuids[0]
-            if (device.scanRecord?.serviceData?.containsKey(firstServiceUuid) == true) {
-                holder.DataTxt.text = device.scanRecord?.serviceData!![firstServiceUuid]?.toList().toString()
+            // 제조사 정보
+            val manufacturerSpecificData = device.scanRecord?.manufacturerSpecificData
+            if (manufacturerSpecificData != null && manufacturerSpecificData.isNotEmpty()) {
+                val manufacturerId = manufacturerSpecificData.keyAt(0)
+                val manufacturerData = manufacturerSpecificData.valueAt(0)
+                holder.CompanyKeyTxt.text = Utils.manufacureID(manufacturerId)
+                holder.CompanyValueTxt.text = Utils.bytesToHex(manufacturerData)
+                holder.DetailsLayout.visibility = View.VISIBLE
             } else {
+                holder.CompanyKeyTxt.text = "Unknown"
+                holder.CompanyValueTxt.text = "N/A"
+                holder.DetailsLayout.visibility = View.GONE
+            }
+
+            // Service UUID (숨김 처리, SettingFragment에서 사용)
+            val serviceUuids = device.scanRecord?.serviceUuids
+            if (!serviceUuids.isNullOrEmpty()) {
+                holder.UuidTxt.text = serviceUuids[0].toString()
+                val firstServiceUuid = serviceUuids[0]
+                if (device.scanRecord?.serviceData?.containsKey(firstServiceUuid) == true) {
+                    holder.DataTxt.text = device.scanRecord?.serviceData!![firstServiceUuid]?.toList().toString()
+                } else {
+                    holder.DataTxt.text = "N/A"
+                }
+            } else {
+                holder.UuidTxt.text = "N/A"
                 holder.DataTxt.text = "N/A"
             }
-        } else {
-            holder.UuidTxt.text = "N/A"
-            holder.DataTxt.text = "N/A"
-        }
 
-        // 클릭 리스너
-        if (mListener != null) {
-            holder.itemView.setOnClickListener { v ->
-                mListener?.onClick(v, position)
+            // 클릭 리스너
+            if (mListener != null) {
+                holder.itemView.setOnClickListener { v ->
+                    mListener?.onClick(v, position)
+                }
+            }
+        } else {
+            // 부분 업데이트 (RSSI만 변경)
+            for (payload in payloads) {
+                if (payload == BluetoothDeviceDiffCallback.PAYLOAD_RSSI_CHANGED) {
+                    val device = mList[position]
+                    val rssi = device.rssi
+                    holder.RssiTxt.text = "$rssi dBm"
+                    holder.RssiTxt.setBackgroundColor(getRssiColor(rssi))
+                }
             }
         }
     }
@@ -137,13 +156,16 @@ class UserAdapter(
     }
 
     /**
-     * 장치 목록 업데이트
+     * 장치 목록 업데이트 (DiffUtil 사용)
      */
-    @SuppressLint("NotifyDataSetChanged")
     fun updateDevices(newDevices: MutableList<ScanResult>) {
+        val diffCallback = BluetoothDeviceDiffCallback(mList.toList(), newDevices)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
         mList.clear()
         mList.addAll(newDevices)
-        notifyDataSetChanged()
+
+        diffResult.dispatchUpdatesTo(this)
     }
 
 }

@@ -14,6 +14,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.kyutae.applicationtest.adapters.UserAdapter
 import com.kyutae.applicationtest.bluetooth.BLEController
@@ -205,6 +206,19 @@ class MainFragment : Fragment() {
         bind.recyclerview.apply {
             adapter = userAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+
+            // 애니메이션 최적화 - 빠르고 부드러운 업데이트
+            val animator = DefaultItemAnimator()
+            animator.addDuration = 150 // 새 항목 추가 애니메이션 (기본 250ms)
+            animator.removeDuration = 150 // 항목 제거 애니메이션
+            animator.moveDuration = 200 // 항목 이동 애니메이션
+            animator.changeDuration = 100 // 항목 변경 애니메이션 (RSSI 업데이트 등)
+            animator.supportsChangeAnimations = true // 변경 애니메이션 활성화
+            itemAnimator = animator
+
+            // 스크롤 최적화
+            setHasFixedSize(false) // 항목 크기가 동적이므로 false
+            setItemViewCacheSize(20) // 캐시 크기 증가로 성능 향상
         }
     }
 

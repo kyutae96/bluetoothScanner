@@ -12,6 +12,8 @@ import com.kyutae.applicationtest.dataclass.BluetoothDataClass
 import com.kyutae.applicationtest.dataclass.FilterSettings
 import com.kyutae.applicationtest.database.AppDatabase
 import com.kyutae.applicationtest.database.DeviceRepository
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -86,11 +88,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _connectionState = MutableLiveData<ConnectionState>(ConnectionState.DISCONNECTED)
     val connectionState: LiveData<ConnectionState> = _connectionState
 
+    // 배치 업데이트용 변수
+    private var updateJob: Job? = null
+    private var pendingUpdates = false
+    private val UPDATE_DELAY_MS = 500L // 500ms마다 업데이트
+
     /**
      * 스캔 상태 업데이트
      */
     fun setScanning(isScanning: Boolean) {
         _isScanning.value = isScanning
+
+        // 스캔 중지 시 즉시 업데이트
+        if (!isScanning && pendingUpdates) {
+            updateJob?.cancel()
+            applyFiltersAndSort()
+            pendingUpdates = false
+        }
     }
 
     /**
@@ -102,20 +116,44 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * 스캔된 장치 추가
+     * 스캔된 장치 추가 (배치 업데이트)
      */
     @SuppressLint("MissingPermission")
     fun addDevice(device: ScanResult) {
-        // 중복 체크 (MAC 주소 기반)
-        val exists = _allBluetoothDevices.any { it.device.address == device.device.address }
-        if (!exists) {
+        // 중복 체크 (MAC 주소 기반) 및 업데이트
+        val existingIndex = _allBluetoothDevices.indexOfFirst { it.device.address == device.device.address }
+        if (existingIndex >= 0) {
+            // 기존 장치 업데이트 (RSSI 변경 가능)
+            _allBluetoothDevices[existingIndex] = device
+        } else {
+            // 새 장치 추가
             _allBluetoothDevices.add(device)
-            applyFiltersAndSort()
 
             // 히스토리에 저장
             viewModelScope.launch {
                 repository.addOrUpdateDevice(device)
             }
+        }
+
+        // 배치 업데이트 스케줄링
+        scheduleBatchUpdate()
+    }
+
+    /**
+     * 배치 업데이트 스케줄링
+     * 일정 시간 동안 들어온 장치들을 모아서 한 번에 업데이트
+     */
+    private fun scheduleBatchUpdate() {
+        pendingUpdates = true
+
+        // 기존 작업 취소
+        updateJob?.cancel()
+
+        // 새로운 업데이트 작업 예약
+        updateJob = viewModelScope.launch {
+            delay(UPDATE_DELAY_MS)
+            applyFiltersAndSort()
+            pendingUpdates = false
         }
     }
 
@@ -169,14 +207,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _allBluetoothDevices
         }
 
-        // 정렬 적용
+        // 정렬 적용 (이름 있는 장치 우선)
         val sorted = when (_sortType.value ?: SortType.RSSI) {
-            SortType.RSSI -> filtered.sortedByDescending { it.rssi }
+            SortType.RSSI -> filtered.sortedWith(compareBy(
+                { it.device.name.isNullOrEmpty() },  // 이름 있는 장치가 먼저
+                { -it.rssi }  // 그 다음 RSSI 높은 순
+            ))
             SortType.NAME -> filtered.sortedWith(compareBy(
                 { it.device.name.isNullOrEmpty() },
                 { it.device.name ?: "" }
             ))
-            SortType.ADDRESS -> filtered.sortedBy { it.device.address }
+            SortType.ADDRESS -> filtered.sortedWith(compareBy(
+                { it.device.name.isNullOrEmpty() },  // 이름 있는 장치가 먼저
+                { it.device.address }  // 그 다음 주소순
+            ))
         }
 
         _bluetoothDevices.value = sorted.toMutableList()

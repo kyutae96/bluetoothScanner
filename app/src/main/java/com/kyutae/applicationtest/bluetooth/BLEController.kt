@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothProfile
 import android.content.Context
@@ -39,6 +40,11 @@ class BLEController(
     companion object{
         val gattConnect = MutableLiveData<Boolean>()
         val serviceGet = MutableLiveData<Boolean>()
+
+        // Characteristic Read/Write/Notify 결과를 전달하기 위한 LiveData
+        val characteristicRead = MutableLiveData<Pair<String, ByteArray>>() // UUID, value
+        val characteristicWritten = MutableLiveData<String>() // UUID
+        val characteristicChanged = MutableLiveData<Pair<String, ByteArray>>() // UUID, value
     }
 
 
@@ -172,8 +178,17 @@ class BLEController(
             status: Int
         ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
-            Log.e(TAG, "characteristic  :  ${characteristic}")
+            Log.e(TAG, "onCharacteristicWrite uuid: ${characteristic?.uuid}, status: $status")
 
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                characteristic?.let {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        characteristicWritten.value = it.uuid.toString()
+                    }
+                }
+            } else {
+                Log.e(TAG, "Characteristic write failed with status: $status")
+            }
         }
 
         override fun onCharacteristicChanged(
@@ -182,7 +197,11 @@ class BLEController(
             value: ByteArray
         ) {
             super.onCharacteristicChanged(gatt, characteristic, value)
-            Log.i(TAG, "onCharacteristicChanged uuid : ${characteristic.uuid}")
+            Log.i(TAG, "onCharacteristicChanged uuid: ${characteristic.uuid}, value: ${value.joinToString(" ") { "%02X".format(it) }}")
+
+            CoroutineScope(Dispatchers.Main).launch {
+                characteristicChanged.value = Pair(characteristic.uuid.toString(), value)
+            }
         }
 
         override fun onCharacteristicRead(
@@ -192,8 +211,15 @@ class BLEController(
             status: Int
         ) {
             super.onCharacteristicRead(gatt, characteristic, value, status)
-            Log.i(TAG, "onCharacteristicRead uuid : ${characteristic.uuid}")
+            Log.i(TAG, "onCharacteristicRead uuid: ${characteristic.uuid}, value: ${value.joinToString(" ") { "%02X".format(it) }}, status: $status")
 
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    characteristicRead.value = Pair(characteristic.uuid.toString(), value)
+                }
+            } else {
+                Log.e(TAG, "Characteristic read failed with status: $status")
+            }
         }
     }
 
@@ -221,6 +247,103 @@ class BLEController(
             mBluetoothGatt?.disconnect()
             mBluetoothGatt?.close()
             mBluetoothGatt = null
+        }
+    }
+
+    /**
+     * Characteristic 읽기
+     */
+    @SuppressLint("MissingPermission")
+    fun readCharacteristic(characteristic: BluetoothGattCharacteristic): Boolean {
+        mBluetoothGatt?.let { gatt ->
+            Log.d(TAG, "Reading characteristic: ${characteristic.uuid}")
+            return gatt.readCharacteristic(characteristic)
+        } ?: run {
+            Log.e(TAG, "BluetoothGatt is null, cannot read characteristic")
+            return false
+        }
+    }
+
+    /**
+     * Characteristic 쓰기
+     */
+    @SuppressLint("MissingPermission")
+    fun writeCharacteristic(characteristic: BluetoothGattCharacteristic, value: ByteArray): Boolean {
+        mBluetoothGatt?.let { gatt ->
+            Log.d(TAG, "Writing characteristic: ${characteristic.uuid}, value: ${value.joinToString(" ") { "%02X".format(it) }}")
+
+            // Android 13+ (API 33+)에서는 writeCharacteristic(characteristic, value, writeType) 사용
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val writeType = if ((characteristic.properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0) {
+                    BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+                } else {
+                    BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                }
+                gatt.writeCharacteristic(characteristic, value, writeType) == BluetoothGatt.GATT_SUCCESS
+            } else {
+                // Android 12 이하
+                characteristic.value = value
+                characteristic.writeType = if ((characteristic.properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0) {
+                    BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+                } else {
+                    BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                }
+                gatt.writeCharacteristic(characteristic)
+            }
+        } ?: run {
+            Log.e(TAG, "BluetoothGatt is null, cannot write characteristic")
+            return false
+        }
+    }
+
+    /**
+     * Characteristic Notification 설정
+     */
+    @SuppressLint("MissingPermission")
+    fun setCharacteristicNotification(characteristic: BluetoothGattCharacteristic, enable: Boolean): Boolean {
+        mBluetoothGatt?.let { gatt ->
+            Log.d(TAG, "${if (enable) "Enabling" else "Disabling"} notification for: ${characteristic.uuid}")
+
+            // Local notification 설정
+            val success = gatt.setCharacteristicNotification(characteristic, enable)
+            if (!success) {
+                Log.e(TAG, "Failed to set characteristic notification")
+                return false
+            }
+
+            // Descriptor 설정 (Client Characteristic Configuration Descriptor)
+            val descriptor = characteristic.descriptors?.firstOrNull {
+                it.uuid.toString() == "00002902-0000-1000-8000-00805f9b34fb"
+            }
+
+            descriptor?.let {
+                Log.d(TAG, "Setting descriptor for notification")
+                val value = if (enable) {
+                    if ((characteristic.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0) {
+                        BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                    } else if ((characteristic.properties and BluetoothGattCharacteristic.PROPERTY_INDICATE) != 0) {
+                        BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                    } else {
+                        Log.e(TAG, "Characteristic does not support notification or indication")
+                        return false
+                    }
+                } else {
+                    BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
+                }
+
+                return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    gatt.writeDescriptor(it, value) == BluetoothGatt.GATT_SUCCESS
+                } else {
+                    it.value = value
+                    gatt.writeDescriptor(it)
+                }
+            } ?: run {
+                Log.e(TAG, "Client Characteristic Configuration Descriptor not found")
+                return false
+            }
+        } ?: run {
+            Log.e(TAG, "BluetoothGatt is null, cannot set notification")
+            return false
         }
     }
 }

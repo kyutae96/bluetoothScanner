@@ -1,6 +1,5 @@
 package com.kyutae.applicationtest
 
-import android.bluetooth.BluetoothGattService
 import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
@@ -8,12 +7,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import android.bluetooth.BluetoothGattCharacteristic
 import com.kyutae.applicationtest.MainFragment.Companion.bleGatt
 import com.kyutae.applicationtest.MainFragment.Companion.bluetoothDataClass
 import com.kyutae.applicationtest.adapters.CharacteristicsAdapter
@@ -27,18 +26,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 class SettingFragment : Fragment() {
     lateinit var bind: FragmentSettingBinding
     private val TAG = "SettingFragment"
     lateinit var serviceAdapter: ServiceAdapter
-    lateinit var characteristicsAdapter: CharacteristicsAdapter
     lateinit var mContext: Context
-    var gattServices: BluetoothGattService? = null
-    var gattBatteryServices: BluetoothGattService? = null
-    var gattDeviceInfoServices: BluetoothGattService? = null
     private lateinit var callback: OnBackPressedCallback
+    private var bleController: BLEController? = null
 
     // ViewModel 사용 (Activity 범위로 공유)
     private val viewModel: MainViewModel by activityViewModels()
@@ -73,6 +68,9 @@ class SettingFragment : Fragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), callback)
 
+        // BLE Characteristic Read/Write/Notify 결과 관찰
+        setupBLEObservers()
+
         println("bluetoothDataClass : $bluetoothDataClass")
 
         bind.nameTxt.text = bluetoothDataClass?.deviceName ?: "N/A"
@@ -81,8 +79,18 @@ class SettingFragment : Fragment() {
         bind.typeTxt.text = bluetoothDataClass?.type ?: "N/A"
         bind.companyKeyTxt.text = bluetoothDataClass?.company ?: "N/A"
         bind.companyValueTxt.text = bluetoothDataClass?.companyValue ?: "N/A"
-        bind.serviceUuidTxt.text = bluetoothDataClass?.uuid ?: "N/A"
-        bind.serviceDataTxt.text = bluetoothDataClass?.uuidValue ?: "N/A"
+
+        // Service UUID 처리 (광고 패킷에 포함되지 않을 수 있음)
+        val uuid = bluetoothDataClass?.uuid ?: "N/A"
+        val uuidValue = bluetoothDataClass?.uuidValue ?: "N/A"
+
+        if (uuid == "N/A" || uuid.isBlank()) {
+            bind.serviceUuidTxt.text = "광고 패킷에 포함되지 않음"
+            bind.serviceDataTxt.text = "이 장치는 서비스 UUID를 광고하지 않습니다.\nGATT 연결 후 서비스 목록에서 확인 가능합니다."
+        } else {
+            bind.serviceUuidTxt.text = uuid
+            bind.serviceDataTxt.text = if (uuidValue != "N/A") uuidValue else "데이터 없음"
+        }
 
         // 연결 상태 초기 설정
         viewModel.setConnectionState(ConnectionState.CONNECTING)
@@ -103,30 +111,55 @@ class SettingFragment : Fragment() {
                 Log.e(TAG, "LIVEDATA TRUE")
                 Log.e(TAG, "$bleGatt")
                 if (bleGatt != null) {
-                Log.e(TAG, "${DataCenter.serviceGet()}")
+                    // BLEController 인스턴스 생성
+                    bleController = BLEController(mContext, bleGatt)
+
+                    Log.e(TAG, "${DataCenter.serviceGet()}")
                     CoroutineScope(Dispatchers.Main).launch {
                         bind.progressBar.visibility = View.VISIBLE
                         delay(5000L)
                         bind.progressBar.visibility = View.GONE
-                        if (DataCenter.serviceGet() != null) {
+                        if (DataCenter.serviceGet() != null && bleGatt != null) {
                             val listservice = DataCenter.serviceGet() as List<*>
+
+                            // bleGatt에서 실제 Characteristic 객체를 가져와서 Map 생성
+                            val mapCharc = mutableMapOf<java.util.UUID, List<BluetoothGattCharacteristic>>()
+
+                            bleGatt!!.services.forEach { service ->
+                                val serviceUuid = service.uuid
+                                val characteristics = service.characteristics
+                                mapCharc[serviceUuid] = characteristics
+                            }
+
                             Log.e(TAG, "listservice : ${listservice}")
+                            Log.e(TAG, "mapCharc : ${mapCharc}")
+
                             for (i in listservice.indices) {
                                 Log.e(TAG, "listservice$i : ${listservice[i]}")
                             }
-                            serviceAdapter = ServiceAdapter(mContext, listservice)
-                            serviceAdapter.notifyDataSetChanged()
 
-                            serviceAdapter.mListener = object : ServiceAdapter.OnItemClickListener {
-                                override fun onClick(view: View, position: Int) {
-                                    if (bind.characteristicLinear.visibility == View.VISIBLE) {
-                                        bind.characteristicLinear.visibility = View.GONE
-                                        gattServices = null
-                                    } else {
-                                        onClickItem(listservice[position].toString(), position)
-                                    }
+                            // ServiceAdapter에 characteristics map 전달 (실제 객체)
+                            serviceAdapter = ServiceAdapter(mContext, listservice, mapCharc)
+
+                            // Characteristic 액션 리스너 설정
+                            serviceAdapter.characteristicActionListener = object : CharacteristicsAdapter.OnCharacteristicActionListener {
+                                override fun onReadCharacteristic(characteristic: BluetoothGattCharacteristic) {
+                                    Log.d(TAG, "Read requested for: ${characteristic.uuid}")
+                                    bleController?.readCharacteristic(characteristic)
+                                }
+
+                                override fun onWriteCharacteristic(characteristic: BluetoothGattCharacteristic, value: ByteArray) {
+                                    Log.d(TAG, "Write requested for: ${characteristic.uuid}, value: ${value.joinToString(" ") { "%02X".format(it) }}")
+                                    bleController?.writeCharacteristic(characteristic, value)
+                                }
+
+                                override fun onNotifyCharacteristic(characteristic: BluetoothGattCharacteristic, enable: Boolean) {
+                                    Log.d(TAG, "${if (enable) "Enable" else "Disable"} notification for: ${characteristic.uuid}")
+                                    bleController?.setCharacteristicNotification(characteristic, enable)
                                 }
                             }
+
+                            serviceAdapter.notifyDataSetChanged()
 
                             bind.recyclerview.apply {
                                 adapter = serviceAdapter
@@ -149,44 +182,6 @@ class SettingFragment : Fragment() {
 
     }
 
-    private fun onClickItem(item: String, index: Int) {
-        val serviceUUID = UUID.fromString(item)
-        gattServices = BluetoothGattService(serviceUUID, BluetoothGattService.SERVICE_TYPE_PRIMARY)
-        val mapCharc = DataCenter.charcGet() as Map<*, *>
-
-
-        Log.i(TAG, "mapCharc : ${mapCharc}")
-        if (gattServices!!.uuid.toString().lowercase().startsWith("0000180f")) {
-            gattBatteryServices = gattServices
-
-
-            Log.i(TAG, "gattServices : ${gattServices!!.uuid}")
-//            Log.i(TAG, "gattServices charc  : ${gattBatteryCharacteristic}")
-            Log.i(TAG, "gattbattery : ${gattBatteryServices!!.uuid}")
-        } else if (gattServices!!.uuid.toString().lowercase().startsWith("0000180a")) {
-            gattDeviceInfoServices = gattServices
-            Log.i(TAG, "gattServices : ${gattServices!!.uuid}")
-            Log.i(TAG, "gattDevice : ${gattDeviceInfoServices!!.uuid}")
-        } else {
-            Log.i(TAG, "gattServices : ${gattServices!!.uuid}")
-        }
-        val characteristic = mapCharc[gattServices!!.uuid] as List<*>
-
-        if (characteristic.isEmpty()) {
-            bind.characteristicLinear.visibility = View.GONE
-        } else {
-            bind.characteristicLinear.visibility = View.VISIBLE
-        }
-
-        characteristicsAdapter = CharacteristicsAdapter(mContext, characteristic)
-        characteristicsAdapter.notifyDataSetChanged()
-
-        bind.characteristicRecyclerview.apply {
-            adapter = characteristicsAdapter
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        }
-
-    }
 
     override fun onDetach() {
         super.onDetach()
@@ -239,6 +234,28 @@ class SettingFragment : Fragment() {
             circle.shape = GradientDrawable.OVAL
             circle.setColor(indicatorColor)
             bind.connectionStatusIndicator.background = circle
+        }
+    }
+
+    /**
+     * BLE Characteristic 작업 결과 관찰 설정
+     */
+    private fun setupBLEObservers() {
+        // Characteristic Read 결과
+        BLEController.characteristicRead.observe(viewLifecycleOwner) { (uuid, value) ->
+            Log.d(TAG, "Characteristic read: $uuid, value: ${value.joinToString(" ") { "%02X".format(it) }}")
+            serviceAdapter.updateCharacteristicValue(uuid, value)
+        }
+
+        // Characteristic Write 결과
+        BLEController.characteristicWritten.observe(viewLifecycleOwner) { uuid ->
+            Log.d(TAG, "Characteristic written: $uuid")
+        }
+
+        // Characteristic Changed (Notify)
+        BLEController.characteristicChanged.observe(viewLifecycleOwner) { (uuid, value) ->
+            Log.d(TAG, "Characteristic changed: $uuid, value: ${value.joinToString(" ") { "%02X".format(it) }}")
+            serviceAdapter.updateCharacteristicValue(uuid, value)
         }
     }
 

@@ -12,7 +12,8 @@
       "Bash(powershell -Command \"& ''.\\gradlew.bat'' clean assembleDebug\")",
       "Bash(powershell -Command \"Get-ChildItem Env:JAVA_HOME\")",
       "Bash(powershell -Command \"Test-Path ''C:\\Program Files\\Android\\AndroidStudio\\jbr\\lib\\jvm.cfg''\")",
-      "WebSearch"
+      "WebSearch",
+      "Bash(cmd /c \"cd /d C:\\Users\\bestb\\KyutaeApplication\\applicationtest && gradlew.bat assembleDebug\")"
     ],
     "deny": [],
     "ask": []

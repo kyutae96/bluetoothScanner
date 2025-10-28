@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/service_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginVertical="4dp"
@@ -13,55 +15,133 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="12dp">
+        android:orientation="vertical">
 
-        <!-- 서비스 아이콘 -->
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/baseline_miscellaneous_services_24"
-            android:tint="@color/primary"
-            android:contentDescription="서비스"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/circle_shape"
-            android:padding="4dp"/>
-
-        <!-- 서비스 UUID -->
+        <!-- 서비스 헤더 (클릭 가능) -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/service_header"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="12dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Service UUID"
-                android:textSize="10sp"
-                android:textColor="@color/gray"
-                android:fontFamily="@font/nanum_square_bold"/>
+            <!-- 서비스 아이콘 -->
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/baseline_miscellaneous_services_24"
+                android:tint="@color/primary"
+                android:contentDescription="서비스"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/circle_shape"
+                android:padding="4dp"/>
 
-            <TextView
-                android:id="@+id/service_txt"
-                android:layout_width="wrap_content"
+            <!-- 서비스 UUID -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="N/A"
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                android:fontFamily="monospace"
-                android:layout_marginTop="2dp"/>
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Service UUID"
+                    android:textSize="10sp"
+                    android:textColor="@color/gray"
+                    android:fontFamily="@font/nanum_square_bold"/>
+
+                <TextView
+                    android:id="@+id/service_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="N/A"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="2dp"/>
+
+            </LinearLayout>
+
+            <!-- 확장/축소 아이콘 -->
+            <ImageView
+                android:id="@+id/expand_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_round_arrow_forward_ios_42"
+                android:rotation="90"
+                android:tint="@color/gray"
+                android:contentDescription="확장"/>
 
         </LinearLayout>
 
-        <!-- 화살표 아이콘 -->
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_round_arrow_forward_ios_42"
-            android:tint="@color/gray"
-            android:contentDescription="선택"/>
+        <!-- Characteristics 확장 영역 -->
+        <LinearLayout
+            android:id="@+id/characteristics_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:background="@color/light_gray"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            tools:visibility="visible">
+
+            <!-- 구분선 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Characteristics 제목 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/baseline_bubble_chart_24"
+                    android:tint="@color/ewhamint"
+                    android:contentDescription="특성"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="특성 (Characteristics)"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:fontFamily="@font/nanum_square_bold"/>
+
+                <TextView
+                    android:id="@+id/characteristic_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0개"
+                    android:textSize="11sp"
+                    android:textColor="@color/gray"
+                    android:layout_marginStart="8dp"/>
+
+            </LinearLayout>
+
+            <!-- Characteristics RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/characteristics_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="12dp"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/characteristics_item"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

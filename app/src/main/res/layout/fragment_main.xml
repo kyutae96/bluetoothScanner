@@ -9,85 +9,118 @@
     tools:context=".MainActivity">
 
     <!-- 상단 제어 영역 -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:background="@color/white"
-        android:elevation="4dp">
+        app:cardCornerRadius="0dp"
+        app:cardElevation="4dp"
+        android:backgroundTint="@color/white">
 
-        <TextView
-            android:id="@+id/title_text"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="BLE 장치 스캔"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:fontFamily="@font/nanum_square_bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/device_count_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="장치: 0개"
-            android:textSize="14sp"
-            android:textColor="@color/gray"
-            android:layout_marginTop="4dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title_text"/>
+            <!-- 상단 타이틀 및 액션 버튼 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-        <ImageButton
-            android:id="@+id/filter_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_search"
-            android:contentDescription="필터"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toStartOf="@id/sort_button"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+                <!-- 타이틀 및 장치 수 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-        <ImageButton
-            android:id="@+id/sort_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_sort_by_size"
-            android:contentDescription="@string/sort_button"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toStartOf="@id/scan_button"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+                    <TextView
+                        android:id="@+id/title_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BLE 장치 스캔"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/nanum_square_bold"/>
 
-        <Button
-            android:id="@+id/scan_button"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:minWidth="120dp"
-            android:backgroundTint="@color/black"
-            android:text="@string/scan_start"
-            android:textColor="@color/white"
-            android:contentDescription="@string/scan_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+                    <TextView
+                        android:id="@+id/device_count_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="장치: 0개"
+                        android:textSize="13sp"
+                        android:textColor="@color/gray"
+                        android:fontFamily="@font/nanum_square_bold"
+                        android:layout_marginTop="4dp"/>
 
-        <ProgressBar
-            android:id="@+id/progress_circular"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="8dp"
-            android:visibility="gone"
-            tools:visibility="visible"
-            app:layout_constraintEnd_toStartOf="@id/scan_button"
-            app:layout_constraintTop_toTopOf="@id/scan_button"
-            app:layout_constraintBottom_toBottomOf="@id/scan_button"/>
+                </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <!-- 필터 버튼 -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/filter_button"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="필터"
+                    app:icon="@android:drawable/ic_menu_search"
+                    app:iconTint="@color/black"
+                    app:iconSize="24dp"
+                    app:iconGravity="textStart"
+                    android:layout_marginEnd="4dp"/>
+
+                <!-- 정렬 버튼 -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/sort_button"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="@string/sort_button"
+                    app:icon="@android:drawable/ic_menu_sort_by_size"
+                    app:iconTint="@color/black"
+                    app:iconSize="24dp"
+                    app:iconGravity="textStart"/>
+
+            </LinearLayout>
+
+            <!-- 스캔 버튼 및 프로그레스 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="12dp">
+
+                <Button
+                    android:id="@+id/scan_button"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/primary"
+                    android:text="@string/scan_start"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/nanum_square_bold"
+                    android:contentDescription="@string/scan_button"
+                    app:cornerRadius="8dp"/>
+
+                <ProgressBar
+                    android:id="@+id/progress_circular"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="12dp"
+                    android:visibility="gone"
+                    android:indeterminateTint="@color/primary"
+                    tools:visibility="visible"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- 구분선 -->
     <View
@@ -157,7 +190,3 @@
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>
-
-
-
-
