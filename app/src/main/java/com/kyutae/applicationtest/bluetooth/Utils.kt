@@ -6,49 +6,58 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
-import androidx.lifecycle.MutableLiveData
-import com.kyutae.applicationtest.Application
-import com.kyutae.applicationtest.MainFragment
-import com.kyutae.applicationtest.MainFragment.Companion.devicesArr
-import com.kyutae.applicationtest.MainFragment.Companion.userAdapter
-//import com.kyutae.applicationtest.MainActivity.Companion.devicesArr
-//import com.kyutae.applicationtest.MainActivity.Companion.userAdapter
+import com.kyutae.applicationtest.BluesCanApplication
+import com.kyutae.applicationtest.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+/**
+ * BLE 유틸리티 클래스
+ * 블루투스 스캔 및 장치 발견을 담당합니다
+ */
 object Utils {
-    var bluetoothManager = Application.ApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    var bluetoothManager = BluesCanApplication.ApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     var bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
+
+    private var scanJob: Job? = null
+    private var viewModel: MainViewModel? = null
+    private var onDeviceFoundCallback: ((ScanResult) -> Unit)? = null
+
+    /**
+     * ViewModel 설정 (스캔 상태 관리를 위해)
+     */
+    fun setViewModel(vm: MainViewModel) {
+        viewModel = vm
+    }
+
+    /**
+     * 장치 발견 콜백 설정
+     */
+    fun setOnDeviceFoundCallback(callback: (ScanResult) -> Unit) {
+        onDeviceFoundCallback = callback
+    }
 
     private val mLeScanCallback = @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     object : ScanCallback() {
         override fun onScanFailed(errorCode: Int) {
             super.onScanFailed(errorCode)
-            Log.d("scanCallback", "BLE Scan Failed : $errorCode")
+            Log.e("scanCallback", "BLE Scan Failed : $errorCode")
+            viewModel?.setScanning(false)
+            viewModel?.setError("스캔 실패: 에러 코드 $errorCode")
         }
 
         @SuppressLint("MissingPermission")
         override fun onBatchScanResults(results: MutableList<ScanResult>?) {
             super.onBatchScanResults(results)
-            results?.let{
-                // results is not null
-                for (result in it){
-                    val deviceAddress = result.device.address
-                    // 중복 체크
-                    if (!devicesArr.any { it.device.address == deviceAddress }) {
-                        devicesArr.add(result)
-                    }
-//                    if (!devicesArr.contains(result)) devicesArr.add(result)
-//                    if (!devicesArr.contains(result.device) && result.device.name!=null) devicesArr.add(result.device)
-                }
-
+            results?.forEach { result ->
+                viewModel?.addDevice(result)
+                onDeviceFoundCallback?.invoke(result)
             }
         }
 
@@ -56,34 +65,48 @@ object Utils {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
             result?.let {
-                val deviceAddress = result.device.address
-                // 중복 체크
-                if (!devicesArr.any { it.device.address == deviceAddress }) {
-                    devicesArr.add(result)
-                    Log.i("KYUTAE" , "result : ${devicesArr}")
-                }
-
-//                if (!devicesArr.contains(it)) devicesArr.add(it)
-//                Log.i("KYUTAE" , "RSSI : ${it.rssi}")
+                viewModel?.addDevice(it)
+                onDeviceFoundCallback?.invoke(it)
+                Log.i("KYUTAE", "Device found: ${it.device.address}")
             }
-            userAdapter.notifyDataSetChanged()
         }
-
     }
+
+    /**
+     * BLE 스캔 시작/중지
+     * @param state true: 스캔 시작, false: 스캔 중지
+     */
     @SuppressLint("MissingPermission")
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun scanDevice(state:Boolean) = if(state){
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(10000L)
-            bluetoothAdapter?.bluetoothLeScanner?.stopScan(mLeScanCallback)
-            MainFragment.isScanning.value = false
+    fun scanDevice(state: Boolean) {
+        if (state) {
+            // 스캔 시작
+            viewModel?.clearDevices()
+            viewModel?.setScanning(true)
+
+            bluetoothAdapter?.bluetoothLeScanner?.startScan(mLeScanCallback)
+
+            // 10초 후 자동 중지
+            scanJob?.cancel()
+            scanJob = CoroutineScope(Dispatchers.Main).launch {
+                delay(10000L)
+                stopScan()
+            }
+        } else {
+            // 스캔 중지
+            stopScan()
         }
-        devicesArr.clear()
-        bluetoothAdapter?.bluetoothLeScanner?.startScan(mLeScanCallback)
-        MainFragment.isScanning.value = true
-    }else{
+    }
+
+    /**
+     * 스캔 중지
+     */
+    @SuppressLint("MissingPermission")
+    private fun stopScan() {
         bluetoothAdapter?.bluetoothLeScanner?.stopScan(mLeScanCallback)
-        MainFragment.isScanning.value = false
+        viewModel?.setScanning(false)
+        scanJob?.cancel()
+        scanJob = null
     }
 
 

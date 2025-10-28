@@ -1,6 +1,5 @@
 package com.kyutae.applicationtest
 
-import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothManager
@@ -9,34 +8,31 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.widget.Button
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.kyutae.applicationtest.databinding.ActivityMainBinding
 import com.kyutae.applicationtest.dataclass.DataCenter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.kyutae.applicationtest.utils.PermissionManager
 
 class MainActivity : AppCompatActivity() {
-    lateinit var bind: ActivityMainBinding
-//    private lateinit var userAdapter: UserAdapter
+    private lateinit var bind: ActivityMainBinding
     private var bleGatt: BluetoothGatt? = null
-    private val REQUEST_ENABLE_BT=1
-    lateinit var PERMISSIONS: Array<String>
-    private val REQUEST_ALL_PERMISSION = 2
-    var bluetoothManager = Application.ApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    private lateinit var permissionManager: PermissionManager
+
+    var bluetoothManager = BluesCanApplication.ApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     var bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
+
     companion object{
          const val TAG_SETTING = "setting_fragment"
          const val TAG_MAIN = "main_fragment"
@@ -48,45 +44,112 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        permissionCheck()
         super.onCreate(savedInstanceState)
+
+        // Edge-to-edge 활성화
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContentView(R.layout.activity_main)
 
-        if (savedInstanceState == null) {
+        // WindowInsets 적용 (카메라 노치/시스템 바 영역 회피)
+        val mainFrameLayout = findViewById<android.widget.FrameLayout>(R.id.mainFrameLayout)
+        ViewCompat.setOnApplyWindowInsetsListener(mainFrameLayout) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(insets.left, insets.top, insets.right, insets.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
+
+        // 권한 관리자 초기화
+        permissionManager = PermissionManager(
+            context = this,
+            onPermissionsGranted = {
+                onPermissionsGranted()
+            },
+            onPermissionsDenied = { deniedPermissions ->
+                onPermissionsDenied(deniedPermissions)
+            }
+        )
+        permissionManager.registerPermissionLauncher(this)
+
+        // BLE 하드웨어 확인
+        if (!checkBluetoothSupport()) {
+            return
+        }
+
+        // 권한 확인 및 요청
+        permissionManager.checkAndRequestPermissions()
+    }
+
+    /**
+     * 권한이 부여되었을 때 호출
+     */
+    private fun onPermissionsGranted() {
+        Log.d(TAG, "All permissions granted")
+
+        if (supportFragmentManager.findFragmentById(R.id.mainFrameLayout) == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.mainFrameLayout, MainFragment())
                 .commit()
         }
-//        setFragment(TAG_MAIN, MainFragment())
 
-        //블루투스 이용 가능한지 체크하고 불가능 하면 끝낸다.
-        packageManager.takeIf {
-            it.missingSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
-        }?.also {
-            return@onCreate finishForNoBluetooth()
+        // 블루투스 활성화 확인
+        if (bluetoothAdapter?.isEnabled == false) {
+            requestEnableBluetooth()
+        }
+    }
+
+    /**
+     * 권한이 거부되었을 때 호출
+     */
+    private fun onPermissionsDenied(deniedPermissions: List<String>) {
+        Log.e(TAG, "Permissions denied: $deniedPermissions")
+        Toast.makeText(
+            this,
+            "BLE 스캔을 위해 필요한 권한이 거부되었습니다.\n설정에서 권한을 허용해주세요.",
+            Toast.LENGTH_LONG
+        ).show()
+
+        // 설정 화면으로 이동하는 다이얼로그 표시
+        showPermissionDeniedDialog()
+    }
+
+    /**
+     * 블루투스 지원 여부 확인
+     */
+    private fun checkBluetoothSupport(): Boolean {
+        if (packageManager.missingSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this, "이 기기는 BLE를 지원하지 않습니다.", Toast.LENGTH_LONG).show()
+            finishForNoBluetooth()
+            return false
         }
 
-        bluetoothAdapter ?: return finishForNoBluetooth()
-        if (bluetoothAdapter!!.isEnabled) {
-            return
+        if (bluetoothAdapter == null) {
+            Toast.makeText(this, "블루투스를 사용할 수 없습니다.", Toast.LENGTH_LONG).show()
+            finishForNoBluetooth()
+            return false
         }
 
-        //블루투스 꺼있음 -> 킨다 -> 실패하면 앱종료
+        return true
+    }
+
+    /**
+     * 블루투스 활성화 요청
+     */
+    private fun requestEnableBluetooth() {
         val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
         try {
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (it.resultCode != RESULT_OK)
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode != RESULT_OK) {
+                    Toast.makeText(this, "블루투스를 활성화해야 앱을 사용할 수 있습니다.", Toast.LENGTH_LONG).show()
                     finishForNoBluetooth()
-                else {
-                    val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
-                    startActivity(intent)
-//                    scanDevices2()
+                } else {
+                    Log.d(TAG, "Bluetooth enabled successfully")
                 }
             }.launch(enableBtIntent)
         } catch (e: Exception) {
-            finishForNoBluetooth()
-            Log.e(TAG, "Exception : $e")
+            Log.e(TAG, "Exception while enabling Bluetooth: $e")
             e.printStackTrace()
+            finishForNoBluetooth()
         }
     }
 
@@ -150,65 +213,37 @@ class MainActivity : AppCompatActivity() {
         fragTransaction.commitAllowingStateLoss()
     }
 
-    private fun permissionCheck(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            PERMISSIONS = arrayOf(
-                Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.BLUETOOTH_CONNECT
-            )
-        } else {
-            PERMISSIONS = arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
+    /**
+     * 권한 거부 시 설정으로 이동하는 다이얼로그 표시
+     */
+    private fun showPermissionDeniedDialog() {
+        val myLayout = layoutInflater.inflate(R.layout.dialog_bluetooth_access, null)
+
+        val builder = AlertDialog.Builder(this, R.style.MyDialogTheme).apply {
+            setView(myLayout)
         }
-        val permissionsToRequest = ArrayList<String>()
-        for (permission in PERMISSIONS) {
-            if (ContextCompat.checkSelfPermission(this, permission)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                permissionsToRequest.add(permission)
+
+        val accessBtn = myLayout.findViewById<Button>(R.id.access_btn)
+        accessBtn.text = "설정으로 이동"
+        accessBtn.setOnClickListener {
+            try {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    .setData(Uri.parse("package:$packageName"))
+                startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                e.printStackTrace()
             }
-        }
-        if (permissionsToRequest.isNotEmpty()) {
-            ActivityCompat.requestPermissions(
-                this,
-                permissionsToRequest.toTypedArray(),
-                REQUEST_ENABLE_BT
-            )
-        } else {
-            // 이미 모든 권한이 있는 경우 처리할 작업을 여기에 추가
+            finish()
         }
 
-
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.show()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         DataCenter.serviceDel()
-
         Log.e(TAG, "$TAG  : onDestroy")
-    }
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String?>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            REQUEST_ALL_PERMISSION -> {
-                Log.i("APP SINGING :", "APP SINGING CHECK START!")
-                Log.i("APP SINGING :", "CERTIFIED APP")
-                Log.i("APP SINGING :", "APP VERSION CHECK START!")
-                Log.i("APP VERSION : ", "1.0.0  >>  The Latest Version")
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
-                    startActivity(intent)
-                } else {
-                    finishForNoBluetooth()
-                }
-            }
-        }
     }
     private fun finishForNoBluetooth() {
         val myLayout = layoutInflater.inflate(R.layout.dialog_bluetooth_access, null)

@@ -5,300 +5,557 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white"
+    android:background="@color/light_gray"
     tools:context=".MainActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
+    <!-- 상단 헤더 -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:padding="10dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/backBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:rotation="180"
-            android:src="@drawable/ic_round_arrow_forward_ios_42"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Result"
-            android:fontFamily="@font/nanum_square_bold"
-            android:textColor="@color/black"
-            android:textSize="18dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+        android:elevation="4dp"
+        android:paddingVertical="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/border_setting_black"
-                android:orientation="horizontal"
-                android:padding="5dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nanum_square_bold"
-                    android:text="Name"
-                    android:textColor="@color/black"
-                    android:textSize="18dp" />
-
-                <TextView
-                    android:id="@+id/name_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="N/A"
-                    android:textColor="@color/black"
-                    android:textSize="14dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/border_setting_black"
-                android:orientation="horizontal"
-                android:padding="5dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nanum_square_bold"
-                    android:text="Address"
-                    android:textColor="@color/black"
-                    android:textSize="18dp" />
-
-                <TextView
-                    android:id="@+id/address_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="N/A"
-                    android:textColor="@color/black"
-                    android:textSize="14dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/border_setting_black"
-                android:orientation="horizontal"
-                android:padding="5dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nanum_square_bold"
-                    android:text="Rssi"
-                    android:textColor="@color/black"
-                    android:textSize="18dp" />
-
-                <TextView
-                    android:id="@+id/rssi_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="N/A"
-                    android:textColor="@color/black"
-                    android:textSize="14dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/border_setting_black"
-                android:orientation="horizontal"
-                android:padding="5dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nanum_square_bold"
-                    android:text="Type"
-                    android:textColor="@color/black"
-                    android:textSize="18dp" />
-
-                <TextView
-                    android:id="@+id/type_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="N/A"
-                    android:textColor="@color/black"
-                    android:textSize="14dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/border_setting_black"
-                android:orientation="horizontal"
-                android:padding="5dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nanum_square_bold"
-                    android:text="company"
-                    android:textColor="@color/black"
-                    android:textSize="18dp" />
-
-
-                <TextView
-                    android:id="@+id/company_key_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="N/A"
-                    android:textColor="@color/black"
-                    android:textSize="14dp" />
-
-            </LinearLayout>
+            <ImageView
+                android:id="@+id/backBtn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:rotation="180"
+                android:src="@drawable/ic_round_arrow_forward_ios_42"
+                android:contentDescription="@string/back_button"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
 
             <TextView
-                android:id="@+id/company_value_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="장치 상세 정보"
+                android:fontFamily="@font/nanum_square_bold"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:gravity="center"/>
+
+            <!-- 연결 상태 표시 -->
+            <LinearLayout
+                android:id="@+id/connection_status_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="N/A"
-                android:textColor="@color/black"
-                android:textSize="12dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/border_setting_black"
                 android:orientation="horizontal"
-                android:padding="5dp">
+                android:gravity="center_vertical"
+                android:padding="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/border_setting_black">
+
+                <View
+                    android:id="@+id/connection_status_indicator"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/circle_shape" />
 
                 <TextView
+                    android:id="@+id/connection_status_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/nanum_square_bold"
-                    android:text="UUID"
-                    android:textColor="@color/black"
-                    android:textSize="18dp" />
-
-
-                <TextView
-                    android:id="@+id/service_uuid_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="N/A"
-                    android:textColor="@color/black"
-                    android:textSize="14dp" />
+                    android:text="연결 중..."
+                    android:textSize="13sp"
+                    android:textColor="@color/gray"
+                    android:fontFamily="@font/nanum_square_bold" />
 
             </LinearLayout>
 
+        </LinearLayout>
 
-            <TextView
-                android:id="@+id/service_data_txt"
-                android:layout_width="wrap_content"
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- 기본 정보 카드 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="N/A"
-                android:textColor="@color/black"
-                android:textSize="12dp" />
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:contentPadding="16dp">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- 섹션 제목 -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="기본 정보"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/nanum_square_bold"
+                        android:layout_marginBottom="12dp"/>
+
+                    <!-- Name -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/baseline_bluetooth_24"
+                            android:tint="@color/primary"
+                            android:contentDescription="이름"
+                            android:layout_marginEnd="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="장치 이름"
+                                android:textSize="12sp"
+                                android:textColor="@color/gray"
+                                android:fontFamily="@font/nanum_square_bold"/>
+
+                            <TextView
+                                android:id="@+id/name_txt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="N/A"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:fontFamily="@font/nanum_square_bold"
+                                android:layout_marginTop="2dp"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/grey"
+                        android:layout_marginVertical="4dp"/>
+
+                    <!-- Address -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_mylocation"
+                            android:tint="@color/primary"
+                            android:contentDescription="주소"
+                            android:layout_marginEnd="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="MAC 주소"
+                                android:textSize="12sp"
+                                android:textColor="@color/gray"
+                                android:fontFamily="@font/nanum_square_bold"/>
+
+                            <TextView
+                                android:id="@+id/address_txt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="N/A"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:fontFamily="monospace"
+                                android:layout_marginTop="2dp"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/grey"
+                        android:layout_marginVertical="4dp"/>
+
+                    <!-- Type -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_info_details"
+                            android:tint="@color/primary"
+                            android:contentDescription="타입"
+                            android:layout_marginEnd="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="장치 타입"
+                                android:textSize="12sp"
+                                android:textColor="@color/gray"
+                                android:fontFamily="@font/nanum_square_bold"/>
+
+                            <TextView
+                                android:id="@+id/type_txt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="N/A"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:fontFamily="@font/nanum_square_bold"
+                                android:layout_marginTop="2dp"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 신호 및 제조사 정보 카드 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:contentPadding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- 섹션 제목 -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="신호 및 제조사"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/nanum_square_bold"
+                        android:layout_marginBottom="12dp"/>
+
+                    <!-- RSSI -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_compass"
+                            android:tint="@color/primary"
+                            android:contentDescription="신호 강도"
+                            android:layout_marginEnd="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="RSSI (신호 세기)"
+                                android:textSize="12sp"
+                                android:textColor="@color/gray"
+                                android:fontFamily="@font/nanum_square_bold"/>
+
+                            <TextView
+                                android:id="@+id/rssi_txt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="N/A"
+                                android:textSize="20sp"
+                                android:textColor="@color/primary"
+                                android:fontFamily="@font/nanum_square_bold"
+                                android:layout_marginTop="2dp"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/grey"
+                        android:layout_marginVertical="8dp"/>
+
+                    <!-- Company -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_view"
+                            android:tint="@color/primary"
+                            android:contentDescription="제조사"
+                            android:layout_marginEnd="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="제조사"
+                                android:textSize="12sp"
+                                android:textColor="@color/gray"
+                                android:fontFamily="@font/nanum_square_bold"/>
+
+                            <TextView
+                                android:id="@+id/company_key_txt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="N/A"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:fontFamily="@font/nanum_square_bold"
+                                android:layout_marginTop="2dp"/>
+
+                            <!-- Company Value -->
+                            <TextView
+                                android:id="@+id/company_value_txt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="N/A"
+                                android:textSize="12sp"
+                                android:textColor="@color/gray"
+                                android:fontFamily="monospace"
+                                android:layout_marginTop="4dp"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/grey"
+                        android:layout_marginVertical="8dp"/>
+
+                    <!-- Service UUID -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_sort_alphabetically"
+                            android:tint="@color/primary"
+                            android:contentDescription="UUID"
+                            android:layout_marginEnd="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="서비스 UUID"
+                                android:textSize="12sp"
+                                android:textColor="@color/gray"
+                                android:fontFamily="@font/nanum_square_bold"/>
+
+                            <TextView
+                                android:id="@+id/service_uuid_txt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="N/A"
+                                android:textSize="14sp"
+                                android:textColor="@color/black"
+                                android:fontFamily="monospace"
+                                android:layout_marginTop="2dp"/>
+
+                            <!-- Service Data -->
+                            <TextView
+                                android:id="@+id/service_data_txt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="N/A"
+                                android:textSize="12sp"
+                                android:textColor="@color/gray"
+                                android:fontFamily="monospace"
+                                android:layout_marginTop="4dp"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 로딩 인디케이터 -->
             <ProgressBar
                 android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:layout_marginVertical="16dp"/>
 
-            <LinearLayout
+            <!-- GATT 서비스 및 특성 카드 -->
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/service_linear"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/border_setting_black"
-                android:orientation="vertical"
-                android:padding="5dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:visibility="gone"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:contentPadding="16dp"
                 tools:visibility="visible">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nanum_square_bold"
-                    android:text="Service"
-                    android:textColor="@color/black"
-                    android:textSize="18dp" />
-
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerview"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:listitem="@layout/service_item" />
+                    android:orientation="vertical">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="GATT 서비스"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/nanum_square_bold"
+                        android:layout_marginBottom="4dp"/>
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="서비스를 선택하면 특성(Characteristics)을 확인할 수 있습니다"
+                        android:textSize="12sp"
+                        android:textColor="@color/gray"
+                        android:layout_marginBottom="12dp"/>
 
-            <LinearLayout
-                android:id="@+id/characteristic_linear"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/border_setting_black"
-                android:orientation="vertical"
-                android:padding="5dp"
-                android:visibility="gone"
-                tools:visibility="visible">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        tools:listitem="@layout/service_item" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nanum_square_bold"
-                    android:text="Characteristics"
-                    android:textColor="@color/black"
-                    android:textSize="18dp" />
+                    <!-- Characteristics 섹션 -->
+                    <LinearLayout
+                        android:id="@+id/characteristic_linear"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/border_setting_black"
+                        android:padding="12dp"
+                        android:visibility="gone"
+                        tools:visibility="visible">
 
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/characteristic_recyclerview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    tools:listitem="@layout/characteristics_item" />
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/baseline_bubble_chart_24"
+                                android:tint="@color/primary"
+                                android:contentDescription="특성"
+                                android:layout_marginEnd="8dp"/>
 
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="특성 (Characteristics)"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/black"
+                                android:fontFamily="@font/nanum_square_bold"/>
 
-            </LinearLayout>
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/characteristic_recyclerview"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false"
+                            tools:listitem="@layout/characteristics_item" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 

@@ -4,14 +4,12 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
 import android.content.Context
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.util.isNotEmpty
 import androidx.recyclerview.widget.RecyclerView
 import com.kyutae.applicationtest.R
@@ -31,7 +29,7 @@ class UserAdapter(
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var itemLinear = itemView.findViewById<LinearLayout>(R.id.item_linear)
+        var itemLinear = itemView.findViewById<View>(R.id.item_linear)
         var NameTxt = itemView.findViewById<TextView>(R.id.name_txt)
         var AddressTxt = itemView.findViewById<TextView>(R.id.address_txt)
         var RssiTxt = itemView.findViewById<TextView>(R.id.rssi_txt)
@@ -40,6 +38,7 @@ class UserAdapter(
         var CompanyValueTxt = itemView.findViewById<TextView>(R.id.company_value_txt)
         var UuidTxt = itemView.findViewById<TextView>(R.id.service_uuid_txt)
         var DataTxt = itemView.findViewById<TextView>(R.id.service_data_txt)
+        var DetailsLayout = itemView.findViewById<LinearLayout>(R.id.details_layout)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -54,63 +53,82 @@ class UserAdapter(
     @SuppressLint("MissingPermission")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         initBindViewHolder(holder)
-        holder.NameTxt.text = mList[position].device.name ?: "N/A"
-        holder.AddressTxt.text = mList[position].device.address
-        holder.RssiTxt.text = mList[position].rssi.toString()
-        when(mList[position].device.type){
-            BluetoothDevice.DEVICE_TYPE_UNKNOWN -> holder.TypeTxt.text = "UNKNOWN 장치"
-            BluetoothDevice.DEVICE_TYPE_CLASSIC -> holder.TypeTxt.text = "Bluetooth Classic 장치"
-            BluetoothDevice.DEVICE_TYPE_LE -> {
-                holder.TypeTxt.text = "Bluetooth LE 장치"
-                holder.itemLinear.setBackgroundResource(R.drawable.border_bluetooth_item_blue)
-            }
-            BluetoothDevice.DEVICE_TYPE_DUAL -> {
-                holder.TypeTxt.text = "Bluetooth Classic & LE 장치"
-                holder.itemLinear.setBackgroundResource(R.drawable.border_bluetooth_item_blue)
-            }
+        val device = mList[position]
+
+        // 장치 이름
+        holder.NameTxt.text = device.device.name ?: "Unknown Device"
+
+        // MAC 주소
+        holder.AddressTxt.text = device.device.address
+
+        // RSSI (신호 강도) - 색상으로 강도 표시
+        val rssi = device.rssi
+        holder.RssiTxt.text = "$rssi dBm"
+        holder.RssiTxt.setBackgroundColor(getRssiColor(rssi))
+
+        // 장치 타입 (간소화)
+        val deviceType = when(device.device.type){
+            BluetoothDevice.DEVICE_TYPE_LE -> "LE"
+            BluetoothDevice.DEVICE_TYPE_CLASSIC -> "Classic"
+            BluetoothDevice.DEVICE_TYPE_DUAL -> "Dual"
+            else -> "Unknown"
         }
-        holder.CompanyKeyTxt.text = "N/A"
-        holder.CompanyValueTxt.text = "N/A"
-        val manufacturerSpecificData = mList[position].scanRecord?.manufacturerSpecificData
+        holder.TypeTxt.text = deviceType
+
+        // 제조사 정보
+        val manufacturerSpecificData = device.scanRecord?.manufacturerSpecificData
         if (manufacturerSpecificData != null && manufacturerSpecificData.isNotEmpty()) {
-            // 제조사 식별자를 통해 제조사 정보를 식별
             val manufacturerId = manufacturerSpecificData.keyAt(0)
             val manufacturerData = manufacturerSpecificData.valueAt(0)
-
             holder.CompanyKeyTxt.text = Utils.manufacureID(manufacturerId)
-//            holder.CompanyValueTxt.text = manufacturerData.toList().toString()
             holder.CompanyValueTxt.text = Utils.bytesToHex(manufacturerData)
-        }
-        val serviceUuids = mList[position].scanRecord?.serviceUuids
-
-        if (serviceUuids.isNullOrEmpty()) {
-            holder.UuidTxt.text = "N/A"
-            holder.DataTxt.text = "N/A"
+            holder.DetailsLayout.visibility = View.VISIBLE
         } else {
+            holder.CompanyKeyTxt.text = "Unknown"
+            holder.CompanyValueTxt.text = "N/A"
+            holder.DetailsLayout.visibility = View.GONE
+        }
+
+        // Service UUID (숨김 처리, SettingFragment에서 사용)
+        val serviceUuids = device.scanRecord?.serviceUuids
+        if (!serviceUuids.isNullOrEmpty()) {
             holder.UuidTxt.text = serviceUuids[0].toString()
             val firstServiceUuid = serviceUuids[0]
-            if (mList[position].scanRecord?.serviceData?.containsKey(firstServiceUuid) == true) {
-                holder.DataTxt.text = mList[position].scanRecord?.serviceData!![firstServiceUuid]?.toList().toString()
+            if (device.scanRecord?.serviceData?.containsKey(firstServiceUuid) == true) {
+                holder.DataTxt.text = device.scanRecord?.serviceData!![firstServiceUuid]?.toList().toString()
             } else {
                 holder.DataTxt.text = "N/A"
             }
+        } else {
+            holder.UuidTxt.text = "N/A"
+            holder.DataTxt.text = "N/A"
         }
 
-//        val appearance = scanRecord?.appearance
-
+        // 클릭 리스너
         if (mListener != null) {
             holder.itemView.setOnClickListener { v ->
                 mListener?.onClick(v, position)
             }
         }
+    }
 
+    /**
+     * RSSI 값에 따른 신호 강도 색상 반환
+     */
+    private fun getRssiColor(rssi: Int): Int {
+        return when {
+            rssi >= -50 -> ContextCompat.getColor(mContext, R.color.ewhagreen)  // 강함
+            rssi >= -70 -> ContextCompat.getColor(mContext, R.color.ewhayellow)  // 보통
+            else -> ContextCompat.getColor(mContext, R.color.ewhacoral)          // 약함
+        }
     }
 
     fun initBindViewHolder(holder: ViewHolder){
-        holder.itemLinear.setBackgroundResource(R.drawable.border_user_item)
+        // MaterialCardView styling is handled in XML, no need to set background
         holder.NameTxt.text = null
         holder.AddressTxt.text = null
         holder.RssiTxt.text = null
+        holder.RssiTxt.setBackgroundColor(ContextCompat.getColor(mContext, R.color.grey))
         holder.TypeTxt.text = null
         holder.CompanyKeyTxt.text = null
         holder.CompanyValueTxt.text = null
@@ -118,6 +136,14 @@ class UserAdapter(
         holder.DataTxt.text = null
     }
 
-
+    /**
+     * 장치 목록 업데이트
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateDevices(newDevices: MutableList<ScanResult>) {
+        mList.clear()
+        mList.addAll(newDevices)
+        notifyDataSetChanged()
+    }
 
 }

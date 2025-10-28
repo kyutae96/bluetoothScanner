@@ -1,179 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_linear"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp"
-    android:paddingHorizontal="10dp"
-    android:paddingVertical="8dp"
-    android:background="@drawable/border_user_item"
-    android:gravity="center|start"
-    android:id="@+id/item_linear"
-    android:orientation="horizontal">
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:layout_margin="8dp"
-        android:src="@drawable/baseline_bluetooth_24"/>
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp"
+    app:cardBackgroundColor="@color/white">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="match_parent"
+        android:padding="16dp">
+
+        <!-- 블루투스 아이콘 -->
+        <ImageView
+            android:id="@+id/bluetooth_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="8dp"
+            android:src="@drawable/baseline_bluetooth_24"
+            android:contentDescription="@string/bluetooth_device"
+            android:background="@color/grey"
+            app:tint="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <!-- 장치 이름 -->
+        <TextView
+            android:id="@+id/name_txt"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="14dp"
-                android:text="name : "/>
+            android:layout_marginStart="16dp"
+            android:text="Unknown Device"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:fontFamily="@font/nanum_square_bold"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@id/bluetooth_icon"
+            app:layout_constraintEnd_toStartOf="@id/rssi_txt"
+            app:layout_constraintTop_toTopOf="@id/bluetooth_icon"/>
 
-            <TextView
-                android:id="@+id/name_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="14dp"
-                android:text="N/A"/>
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- MAC 주소 -->
+        <TextView
+            android:id="@+id/address_txt"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="14dp"
-                android:text="address : "/>
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:text="00:00:00:00:00:00"
+            android:textSize="12sp"
+            android:textColor="@color/gray"
+            android:fontFamily="monospace"
+            android:maxLines="1"
+            app:layout_constraintStart_toEndOf="@id/bluetooth_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/name_txt"/>
 
-            <TextView
-                android:id="@+id/address_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="14dp"
-                android:text="N/A"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- RSSI (신호 강도) -->
+        <TextView
+            android:id="@+id/rssi_txt"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="14dp"
-                android:text="rssi : "/>
+            android:text="-50"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:background="@color/grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/name_txt"/>
 
-            <TextView
-                android:id="@+id/rssi_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="14dp"
-                android:text="N/A"/>
-
-        </LinearLayout>
-
+        <!-- 장치 타입 및 제조사 정보 (선택적 표시) -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/details_layout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="14dp"
-                android:text="type : "/>
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintStart_toEndOf="@id/bluetooth_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address_txt">
 
+            <!-- 장치 타입 -->
             <TextView
                 android:id="@+id/type_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="14dp"
-                android:text="N/A"/>
+                android:text="LE"
+                android:textSize="11sp"
+                android:textColor="@color/white"
+                android:background="@color/blue"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:layout_marginEnd="8dp"/>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            <!-- 제조사 -->
             <TextView
+                android:id="@+id/company_key_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="14dp"
-                android:text="company : "/>
-
-
-                <TextView
-                    android:id="@+id/company_key_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="14dp"
-                    android:text="N/A"/>
+                android:text="Unknown"
+                android:textSize="11sp"
+                android:textColor="@color/gray"
+                android:maxLines="1"
+                android:ellipsize="end"/>
 
         </LinearLayout>
 
+        <!-- 숨겨진 상세 정보 (필요 시만 사용) -->
         <TextView
             android:id="@+id/company_value_txt"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="12dp"
-            android:text="N/A"/>
+            android:visibility="gone"
+            android:text="N/A"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/details_layout"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/service_uuid_txt"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="14dp"
-                android:text="UUID : "/>
-
-
-            <TextView
-                android:id="@+id/service_uuid_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="14dp"
-                android:text="N/A"/>
-
-        </LinearLayout>
-
+            android:visibility="gone"
+            android:text="N/A"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/company_value_txt"/>
 
         <TextView
             android:id="@+id/service_data_txt"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="12dp"
-            android:text="N/A"/>
+            android:visibility="gone"
+            android:text="N/A"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/service_uuid_txt"/>
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </LinearLayout>
-
-
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

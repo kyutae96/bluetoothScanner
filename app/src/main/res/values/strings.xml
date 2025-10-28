@@ -1,3 +1,36 @@
 <resources>
     <string name="app_name">BluesCan</string>
+
+    <!-- Accessibility -->
+    <string name="back_button">뒤로 가기</string>
+    <string name="scan_button">스캔</string>
+    <string name="scan_start">스캔 시작</string>
+    <string name="scan_stop">스캔 중지</string>
+    <string name="sort_button">정렬</string>
+    <string name="bluetooth_device">블루투스 장치</string>
+    <string name="device_list_item">장치 항목</string>
+    <string name="connection_status">연결 상태</string>
+    <string name="sort_menu">정렬 메뉴</string>
+    <string name="device_details">장치 상세정보</string>
+
+    <!-- UI Text -->
+    <string name="scanning">스캔 중...</string>
+    <string name="no_devices_found">장치를 찾을 수 없습니다</string>
+    <string name="connecting">연결 중...</string>
+    <string name="connected">연결됨</string>
+    <string name="disconnected">연결 끊김</string>
+
+    <!-- Error Messages -->
+    <string name="error_bluetooth_not_supported">이 기기는 블루투스를 지원하지 않습니다</string>
+    <string name="error_bluetooth_disabled">블루투스가 꺼져 있습니다</string>
+    <string name="error_permission_denied">권한이 거부되었습니다</string>
+    <string name="error_scan_failed">스캔 실패</string>
+    <string name="error_connection_failed">연결 실패</string>
+
+    <!-- AdMob IDs -->
+    <string name="admob_app_id">ca-app-pub-6001930991464725~1388238942</string>
+    <string name="admob_interstitial_id">ca-app-pub-6001930991464725/5149017413</string>
+
+    <!-- Test AdMob IDs (for development) -->
+    <string name="admob_test_interstitial_id">ca-app-pub-3940256099942544/1033173712</string>
 </resources>

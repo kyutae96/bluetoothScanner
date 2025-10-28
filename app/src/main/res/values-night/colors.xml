@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Mode Colors -->
+    <color name="black">#FFFFFFFF</color>
+    <color name="white">#121212</color>
+    <color name="blue">#5A8FB7</color>
+    <color name="red">#CF6679</color>
+    <color name="lightblack">#2C2C2C</color>
+    <color name="grey">#2C2C2C</color>
+    <color name="gray">#B0B0B0</color>
+    <color name="ewhagreen">#4A9E7A</color>
+    <color name="ewhablossom">#1E1E1E</color>
+    <color name="ewhagrey">#6E6E6E</color>
+    <color name="ewhablue">#5FB8D4</color>
+    <color name="ewhamint">#52C4A9</color>
+    <color name="ewhacoral">#FF8E82</color>
+    <color name="ewhayellow">#D4E047</color>
+
+    <!-- 추가 색상 -->
+    <color name="light_gray">#1E1E1E</color>
+    <color name="primary">#64B5F6</color>
+
+</resources>

@@ -1,26 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/border_setting_black"
-    android:gravity="center|start"
     android:orientation="horizontal"
-    android:paddingHorizontal="10dp"
-    android:paddingVertical="2dp">
+    android:gravity="center_vertical"
+    android:paddingVertical="8dp"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:background="?attr/selectableItemBackground">
 
+    <!-- 연결선 (왼쪽 여백으로 계층 표시) -->
+    <View
+        android:layout_width="3dp"
+        android:layout_height="match_parent"
+        android:background="@color/grey"
+        android:layout_marginEnd="8dp"/>
+
+    <!-- 특성 아이콘 -->
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:layout_margin="8dp"
-        android:src="@drawable/baseline_bubble_chart_24" />
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/baseline_bubble_chart_24"
+        android:tint="@color/ewhamint"
+        android:contentDescription="특성"
+        android:layout_marginEnd="12dp"/>
 
+    <!-- 특성 UUID -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Characteristic UUID"
+            android:textSize="9sp"
+            android:textColor="@color/gray"
+            android:fontFamily="@font/nanum_square_bold"/>
 
         <TextView
             android:id="@+id/characteristic_txt"
@@ -28,10 +46,10 @@
             android:layout_height="wrap_content"
             android:text="N/A"
             android:textColor="@color/black"
-            android:textSize="14dp" />
-
+            android:textSize="12sp"
+            android:fontFamily="monospace"
+            android:layout_marginTop="2dp"/>
 
     </LinearLayout>
-
 
 </LinearLayout>

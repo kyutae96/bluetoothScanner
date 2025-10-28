@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/sort_by_rssi"
+        android:title="신호 강도순" />
+    <item
+        android:id="@+id/sort_by_name"
+        android:title="이름순" />
+    <item
+        android:id="@+id/sort_by_address"
+        android:title="주소순" />
+</menu>

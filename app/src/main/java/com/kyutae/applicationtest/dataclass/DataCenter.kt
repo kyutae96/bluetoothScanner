@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
-import com.kyutae.applicationtest.Application
+import com.kyutae.applicationtest.BluesCanApplication
 import java.util.UUID
 
 object DataCenter {
@@ -15,7 +15,7 @@ object DataCenter {
 
 
     fun load() {
-        val prefs: SharedPreferences = Application.application.getSharedPreferences("bluetoothInfo", 0)
+        val prefs: SharedPreferences = BluesCanApplication.instance.getSharedPreferences("bluetoothInfo", 0)
         prefs.getString("bluetoothInfo", null)?.let {
             val json = Parser.default().parse(StringBuilder(it)) as JsonObject
             item.putAll(json)
@@ -26,21 +26,21 @@ object DataCenter {
 
     fun put(k: String, v: List<String>) {
         item[k] = v
-        val prefs: SharedPreferences = Application.application.getSharedPreferences("bluetoothInfo", 0)
+        val prefs: SharedPreferences = BluesCanApplication.instance.getSharedPreferences("bluetoothInfo", 0)
         prefs.edit().apply {
             putString("bluetoothInfo", item.toJsonString())
         }.apply()
     }
     fun putC(k: String, v: MutableMap<UUID, ArrayList<String>>) {
         item[k] = v
-        val prefs: SharedPreferences = Application.application.getSharedPreferences("bluetoothInfo", 0)
+        val prefs: SharedPreferences = BluesCanApplication.instance.getSharedPreferences("bluetoothInfo", 0)
         prefs.edit().apply {
             putString("bluetoothInfo", item.toJsonString())
         }.apply()
     }
     fun del(k: String) {
         item.remove(k)
-        val prefs: SharedPreferences = Application.application.getSharedPreferences("bluetoothInfo", 0)
+        val prefs: SharedPreferences = BluesCanApplication.instance.getSharedPreferences("bluetoothInfo", 0)
         prefs.edit().apply {
             putString("bluetoothInfo", item.toJsonString())
         }.apply()

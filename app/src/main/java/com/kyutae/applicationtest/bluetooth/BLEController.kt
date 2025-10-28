@@ -66,36 +66,42 @@ class BLEController(
             super.onServicesDiscovered(gatt, status)
             when (status) {
                 BluetoothGatt.GATT_SUCCESS -> {
+                    gatt ?: run {
+                        Log.e(TAG, "Gatt is null in onServicesDiscovered")
+                        return
+                    }
+
                     Log.i(TAG, "Connected to GATT_SUCCESS.")
                     Log.i(TAG, "createBond Result : Complete")
                     CoroutineScope(Dispatchers.Main).launch {
                         gattConnect.value = true
                         Log.i(TAG, "gattConnect LIVEDATA : Complete")
                     }
+
                     services.clear()
                     characMap.clear()
-//                    characArray.clear()
-                    for (i in gatt!!.services.indices) {
-                        val serviceUuid = gatt.services[i].uuid
+
+                    gatt.services.forEachIndexed { _, service ->
+                        val serviceUuid = service.uuid
                         Log.i(TAG, "gattService : $serviceUuid")
                         services.add(serviceUuid.toString())
 
                         val characArray = arrayListOf<String>()
 
-                        for (j in gatt.services[i].characteristics.indices) {
-                            val characUuid = gatt.services[i].characteristics[j].uuid
+                        service.characteristics.forEach { characteristic ->
+                            val characUuid = characteristic.uuid
                             Log.i(TAG, "gattServiceCharac : $characUuid")
                             characArray.add(characUuid.toString())
                         }
                         characMap[serviceUuid] = characArray
                     }
+
                     DataCenter.charcSet(characMap)
                     DataCenter.serviceSet(services)
                     checkGattServices(gatt.services)
-                    Log.i(TAG, "characMap : ${characMap}")
-                    Log.i(TAG, "gatt.device.name : ${gatt.device.name}")
-                    broadcastUpdate("Connected " + mBluetoothDevice?.name)
-
+                    Log.i(TAG, "characMap : $characMap")
+                    Log.i(TAG, "gatt.device.name : ${gatt.device?.name ?: "Unknown"}")
+                    broadcastUpdate("Connected " + (mBluetoothDevice?.name ?: "Unknown Device"))
                 }
 
                 else -> {
@@ -103,7 +109,7 @@ class BLEController(
                     CoroutineScope(Dispatchers.Main).launch {
                         gattConnect.value = false
                     }
-                    broadcastUpdate("Fail Connect " + mBluetoothDevice?.name)
+                    broadcastUpdate("Fail Connect " + (mBluetoothDevice?.name ?: "Unknown Device"))
                 }
             }
         }
@@ -154,9 +160,9 @@ class BLEController(
         private fun broadcastUpdate(str: String) {
             CoroutineScope(Dispatchers.Main).launch {
                 Toast.makeText(mContext, str, Toast.LENGTH_SHORT).show()
-                println("name : ${mBluetoothDevice!!.name}")
-                println("address : ${mBluetoothDevice!!.address}")
-                println("type : ${mBluetoothDevice!!.type}")
+                mBluetoothDevice?.let { device ->
+                    Log.d(TAG, "Device Info - name: ${device.name ?: "Unknown"}, address: ${device.address}, type: ${device.type}")
+                }
             }
         }
 

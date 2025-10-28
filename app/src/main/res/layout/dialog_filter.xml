@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- 타이틀 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="스캔 필터"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingBottom="16dp"/>
+
+        <!-- 이름 필터 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="장치 이름"
+            android:textSize="14sp"
+            android:paddingBottom="8dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="이름 입력 (부분 일치)"
+            app:boxBackgroundMode="outline">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/filter_name_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- RSSI 필터 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="최소 신호 강도 (RSSI)"
+            android:textSize="14sp"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/filter_rssi_value"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="-100 dBm"
+                android:textSize="14sp"/>
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/filter_rssi_slider"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:valueFrom="-100"
+                android:valueTo="0"
+                android:stepSize="5"
+                android:value="-100"/>
+        </LinearLayout>
+
+        <!-- 서비스 UUID 필터 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="서비스 UUID"
+            android:textSize="14sp"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="UUID 입력 (부분 일치)"
+            app:boxBackgroundMode="outline">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/filter_uuid_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- 연결 가능 필터 -->
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/filter_connectable_checkbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="연결 가능한 장치만 표시"
+            android:paddingTop="16dp"/>
+
+        <!-- 버튼 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:paddingTop="24dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/filter_reset_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="초기화"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/filter_cancel_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="취소"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/filter_apply_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="적용"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
