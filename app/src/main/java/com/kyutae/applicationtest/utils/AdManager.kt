@@ -51,7 +51,7 @@ class AdManager(private val context: Context) {
         if (BuildConfig.DEBUG) {
             Toast.makeText(
                 context,
-                "🧪 테스트 광고 로드 중...",
+                "테스트 광고 로드 중...",
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -62,7 +62,7 @@ class AdManager(private val context: Context) {
             adRequest,
             object : InterstitialAdLoadCallback() {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
-                    Log.e(TAG, "❌ Ad failed to load")
+                    Log.e(TAG, "Ad failed to load")
                     Log.e(TAG, "Error code: ${adError.code}")
                     Log.e(TAG, "Error message: ${adError.message}")
                     interstitialAd = null
@@ -70,7 +70,7 @@ class AdManager(private val context: Context) {
                 }
 
                 override fun onAdLoaded(ad: InterstitialAd) {
-                    Log.d(TAG, "✅ Ad loaded successfully!")
+                    Log.d(TAG, "Ad loaded successfully!")
                     Log.d(TAG, "Ad is ready to show")
                     interstitialAd = ad
 
@@ -78,7 +78,7 @@ class AdManager(private val context: Context) {
                     if (BuildConfig.DEBUG) {
                         Toast.makeText(
                             context,
-                            "✅ 테스트 광고 로드 완료!",
+                            "테스트 광고 로드 완료!",
                             Toast.LENGTH_SHORT
                         ).show()
                     }

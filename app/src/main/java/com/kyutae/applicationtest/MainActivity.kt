@@ -1,6 +1,8 @@
 package com.kyutae.applicationtest
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothManager
 import android.content.ActivityNotFoundException
@@ -21,6 +23,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.kyutae.applicationtest.bluetooth.BLEController
 import com.kyutae.applicationtest.databinding.ActivityMainBinding
 import com.kyutae.applicationtest.dataclass.DataCenter
 import com.kyutae.applicationtest.utils.PermissionManager
@@ -78,6 +81,50 @@ class MainActivity : AppCompatActivity() {
 
         // 권한 확인 및 요청
         permissionManager.checkAndRequestPermissions()
+
+        // 재연결 인텐트 처리
+        handleReconnectIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleReconnectIntent(intent)
+    }
+
+    /**
+     * 자동 재연결 인텐트 처리
+     */
+    @SuppressLint("MissingPermission")
+    private fun handleReconnectIntent(intent: Intent?) {
+        if (intent?.action == "ACTION_AUTO_RECONNECT") {
+            val deviceAddress = intent.getStringExtra("EXTRA_DEVICE_ADDRESS")
+            if (deviceAddress != null) {
+                Log.d(TAG, "Auto-reconnect requested for device: $deviceAddress")
+
+                // 블루투스 어댑터에서 장치 가져오기
+                try {
+                    val device: BluetoothDevice = bluetoothAdapter?.getRemoteDevice(deviceAddress)
+                        ?: run {
+                            Log.e(TAG, "Failed to get remote device")
+                            Toast.makeText(this, R.string.error_device_not_found, Toast.LENGTH_SHORT).show()
+                            return
+                        }
+
+                    // BLE 연결 시도
+                    bleGatt = BLEController(this, bleGatt).connectGatt(device)
+                    Toast.makeText(this, R.string.toast_reconnecting, Toast.LENGTH_SHORT).show()
+
+                    // SettingFragment로 이동
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.mainFrameLayout, SettingFragment())
+                        .addToBackStack(null)
+                        .commit()
+                } catch (e: IllegalArgumentException) {
+                    Log.e(TAG, "Invalid device address: $deviceAddress", e)
+                    Toast.makeText(this, R.string.error_invalid_address, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     /**
@@ -118,13 +165,13 @@ class MainActivity : AppCompatActivity() {
      */
     private fun checkBluetoothSupport(): Boolean {
         if (packageManager.missingSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, "이 기기는 BLE를 지원하지 않습니다.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_LONG).show()
             finishForNoBluetooth()
             return false
         }
 
         if (bluetoothAdapter == null) {
-            Toast.makeText(this, "블루투스를 사용할 수 없습니다.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, R.string.error_bluetooth_disabled, Toast.LENGTH_LONG).show()
             finishForNoBluetooth()
             return false
         }
@@ -140,7 +187,7 @@ class MainActivity : AppCompatActivity() {
         try {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode != RESULT_OK) {
-                    Toast.makeText(this, "블루투스를 활성화해야 앱을 사용할 수 있습니다.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, R.string.dialog_bluetooth_message, Toast.LENGTH_LONG).show()
                     finishForNoBluetooth()
                 } else {
                     Log.d(TAG, "Bluetooth enabled successfully")

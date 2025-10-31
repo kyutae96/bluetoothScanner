@@ -114,4 +114,39 @@ object BleNotificationManager {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(1002, notification)
     }
+
+    /**
+     * 재연결 시도 알림
+     */
+    fun showReconnectNotification(context: Context, deviceAddress: String) {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            action = "ACTION_AUTO_RECONNECT"
+            putExtra("EXTRA_DEVICE_ADDRESS", deviceAddress)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
+            .setContentTitle("BLE 장치 재연결")
+            .setContentText("$deviceAddress 장치에 재연결을 시도합니다")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .addAction(
+                android.R.drawable.ic_menu_revert,
+                "재연결",
+                pendingIntent
+            )
+            .build()
+
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(1003, notification)
+    }
 }

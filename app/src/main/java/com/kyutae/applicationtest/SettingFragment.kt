@@ -20,12 +20,14 @@ import com.kyutae.applicationtest.adapters.ServiceAdapter
 import com.kyutae.applicationtest.bluetooth.BLEController
 import com.kyutae.applicationtest.databinding.FragmentSettingBinding
 import com.kyutae.applicationtest.dataclass.DataCenter
+import com.kyutae.applicationtest.utils.AutoReconnectManager
 import com.kyutae.applicationtest.viewmodel.ConnectionState
 import com.kyutae.applicationtest.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import android.widget.Toast
 
 class SettingFragment : Fragment() {
     lateinit var bind: FragmentSettingBinding
@@ -85,11 +87,11 @@ class SettingFragment : Fragment() {
         val uuidValue = bluetoothDataClass?.uuidValue ?: "N/A"
 
         if (uuid == "N/A" || uuid.isBlank()) {
-            bind.serviceUuidTxt.text = "광고 패킷에 포함되지 않음"
-            bind.serviceDataTxt.text = "이 장치는 서비스 UUID를 광고하지 않습니다.\nGATT 연결 후 서비스 목록에서 확인 가능합니다."
+            bind.serviceUuidTxt.text = getString(R.string.not_advertised)
+            bind.serviceDataTxt.text = getString(R.string.service_not_advertised)
         } else {
             bind.serviceUuidTxt.text = uuid
-            bind.serviceDataTxt.text = if (uuidValue != "N/A") uuidValue else "데이터 없음"
+            bind.serviceDataTxt.text = if (uuidValue != "N/A") uuidValue else getString(R.string.no_data)
         }
 
         // 연결 상태 초기 설정
@@ -103,6 +105,9 @@ class SettingFragment : Fragment() {
         bind.backBtn.setOnClickListener {
             removeFragment()
         }
+
+        // 자동 재연결 스위치 초기화
+        setupAutoReconnectSwitch()
 
         BLEController.gattConnect.observe(requireActivity()) {
             if (it) {
@@ -191,6 +196,39 @@ class SettingFragment : Fragment() {
     }
 
     /**
+     * 자동 재연결 스위치 설정
+     */
+    private fun setupAutoReconnectSwitch() {
+        // 현재 자동 재연결 상태 불러오기
+        val isEnabled = AutoReconnectManager.isAutoReconnectEnabled(mContext)
+        bind.autoReconnectSwitch.isChecked = isEnabled
+
+        // 스위치 변경 리스너
+        bind.autoReconnectSwitch.setOnCheckedChangeListener { _, isChecked ->
+            val deviceAddress = bluetoothDataClass?.address
+
+            if (deviceAddress != null) {
+                if (isChecked) {
+                    // 자동 재연결 활성화
+                    AutoReconnectManager.enableAutoReconnect(mContext, deviceAddress)
+                    Toast.makeText(mContext, R.string.auto_reconnect_enabled, Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, "Auto-reconnect enabled for device: $deviceAddress")
+                } else {
+                    // 자동 재연결 비활성화
+                    AutoReconnectManager.disableAutoReconnect(mContext)
+                    Toast.makeText(mContext, R.string.auto_reconnect_disabled, Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, "Auto-reconnect disabled")
+                }
+            } else {
+                // 장치 주소가 없으면 스위치를 다시 끔
+                bind.autoReconnectSwitch.isChecked = false
+                Toast.makeText(mContext, R.string.device_info_not_available, Toast.LENGTH_SHORT).show()
+                Log.e(TAG, "Device address is null, cannot enable auto-reconnect")
+            }
+        }
+    }
+
+    /**
      * 연결 상태 UI 업데이트
      */
     private fun updateConnectionStatus(state: ConnectionState) {
@@ -200,22 +238,22 @@ class SettingFragment : Fragment() {
 
         when (state) {
             ConnectionState.CONNECTED -> {
-                statusText = "연결됨"
+                statusText = getString(R.string.state_connected)
                 statusColor = ContextCompat.getColor(requireContext(), R.color.ewhagreen)
                 indicatorColor = ContextCompat.getColor(requireContext(), R.color.ewhagreen)
             }
             ConnectionState.CONNECTING -> {
-                statusText = "연결 중..."
+                statusText = getString(R.string.state_connecting)
                 statusColor = ContextCompat.getColor(requireContext(), R.color.ewhayellow)
                 indicatorColor = ContextCompat.getColor(requireContext(), R.color.ewhayellow)
             }
             ConnectionState.DISCONNECTED -> {
-                statusText = "연결 끊김"
+                statusText = getString(R.string.state_disconnected)
                 statusColor = ContextCompat.getColor(requireContext(), R.color.ewhacoral)
                 indicatorColor = ContextCompat.getColor(requireContext(), R.color.ewhacoral)
             }
             ConnectionState.DISCONNECTING -> {
-                statusText = "연결 해제 중..."
+                statusText = getString(R.string.state_disconnecting)
                 statusColor = ContextCompat.getColor(requireContext(), R.color.gray)
                 indicatorColor = ContextCompat.getColor(requireContext(), R.color.gray)
             }

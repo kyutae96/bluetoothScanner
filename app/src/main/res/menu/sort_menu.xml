@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/sort_by_rssi"
-        android:title="신호 강도순" />
+        android:title="@string/sort_by_rssi" />
     <item
         android:id="@+id/sort_by_name"
-        android:title="이름순" />
+        android:title="@string/sort_by_name" />
     <item
         android:id="@+id/sort_by_address"
-        android:title="주소순" />
+        android:title="@string/sort_by_address" />
 </menu>

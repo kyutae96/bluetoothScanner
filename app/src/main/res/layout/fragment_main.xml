@@ -40,7 +40,7 @@
                         android:id="@+id/title_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="BLE 장치 스캔"
+                        android:text="@string/title_ble_scan"
                         android:textSize="22sp"
                         android:textStyle="bold"
                         android:textColor="@color/black"
@@ -50,11 +50,12 @@
                         android:id="@+id/device_count_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="장치: 0개"
+                        android:text="@string/device_count"
                         android:textSize="13sp"
                         android:textColor="@color/gray"
                         android:fontFamily="@font/nanum_square_bold"
-                        android:layout_marginTop="4dp"/>
+                        android:layout_marginTop="4dp"
+                        tools:text="장치: 0개"/>
 
                 </LinearLayout>
 
@@ -64,7 +65,7 @@
                     style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:contentDescription="필터"
+                    android:contentDescription="@string/filter"
                     app:icon="@android:drawable/ic_menu_search"
                     app:iconTint="@color/black"
                     app:iconSize="24dp"
@@ -177,7 +178,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="스캔 버튼을 눌러 주변 장치를 검색하세요"
+                    android:text="@string/empty_scan_description"
                     android:textSize="14sp"
                     android:textColor="@color/gray"
                     android:gravity="center"

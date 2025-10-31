@@ -10,10 +10,13 @@ import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.kyutae.applicationtest.dataclass.DataCenter
+import com.kyutae.applicationtest.utils.AppLogger
 import com.kyutae.bluetoothsearch.static.BATTERY_UUID
 import com.kyutae.bluetoothsearch.static.DEVICE_INFO_UUID
 import com.kyutae.bluetoothsearch.static.TODOC_SERVICE_UUID
@@ -21,6 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicBoolean
 
 class BLEController(
     private val mContext: Context?,
@@ -37,7 +41,16 @@ class BLEController(
     private val TAG = "BLEController"
     var services = arrayListOf<String>()
     var characMap = mutableMapOf<UUID, ArrayList<String>>()
+
+    // 연결 상태 관리
+    private val isConnecting = AtomicBoolean(false)
+    private val isConnected = AtomicBoolean(false)
+    private val handler = Handler(Looper.getMainLooper())
+    private var connectionTimeoutRunnable: Runnable? = null
+
     companion object{
+        private const val CONNECTION_TIMEOUT_MS = 30000L // 30초 타임아웃
+
         val gattConnect = MutableLiveData<Boolean>()
         val serviceGet = MutableLiveData<Boolean>()
 
@@ -52,17 +65,59 @@ class BLEController(
         @SuppressLint("MissingPermission")
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
+
             when (newState) {
                 BluetoothProfile.STATE_CONNECTED -> {
-                    Log.i(TAG, "Connected to GATT Server")
-                    Log.i(
-                        TAG, "Attempting to start service discovery: " +
-                                mBluetoothGatt?.discoverServices()
-                    )
+                    if (status == BluetoothGatt.GATT_SUCCESS) {
+                        AppLogger.i(TAG, "Connected to GATT Server - Status: $status")
+                        isConnecting.set(false)
+                        isConnected.set(true)
+                        cancelConnectionTimeout()
+
+                        // 서비스 발견 시작
+                        val discoverSuccess = mBluetoothGatt?.discoverServices() ?: false
+                        AppLogger.i(TAG, "Service discovery started: $discoverSuccess")
+
+                        if (!discoverSuccess) {
+                            AppLogger.e(TAG, "Failed to start service discovery")
+                            disconnectGattServer()
+                        }
+                    } else {
+                        AppLogger.e(TAG, "Connection failed with status: $status")
+                        disconnectGattServer()
+                    }
                 }
+
                 BluetoothProfile.STATE_DISCONNECTED -> {
-                    Log.e(TAG, "Disconnected to GATT Server")
+                    AppLogger.w(TAG, "Disconnected from GATT Server - Status: $status")
+                    isConnecting.set(false)
+                    isConnected.set(false)
+                    cancelConnectionTimeout()
+
+                    // 상태 업데이트
+                    CoroutineScope(Dispatchers.Main).launch {
+                        gattConnect.value = false
+                    }
+
+                    // 연결 실패 처리
+                    if (status != BluetoothGatt.GATT_SUCCESS) {
+                        when (status) {
+                            133 -> AppLogger.e(TAG, "GATT Error 133: Generic connection error")
+                            8 -> AppLogger.e(TAG, "GATT Error 8: Connection timeout")
+                            19 -> AppLogger.e(TAG, "GATT Error 19: Device disconnected by remote")
+                            else -> AppLogger.e(TAG, "GATT connection error: $status")
+                        }
+                    }
+
                     disconnectGattServer()
+                }
+
+                BluetoothProfile.STATE_CONNECTING -> {
+                    AppLogger.d(TAG, "Connecting to GATT Server...")
+                }
+
+                BluetoothProfile.STATE_DISCONNECTING -> {
+                    AppLogger.d(TAG, "Disconnecting from GATT Server...")
                 }
             }
         }
@@ -226,7 +281,26 @@ class BLEController(
 
     @SuppressLint("MissingPermission")
     fun connectGatt(device: BluetoothDevice): BluetoothGatt? {
+        // 이미 연결 중이면 중복 연결 방지
+        if (isConnecting.get()) {
+            AppLogger.w(TAG, "Connection already in progress, ignoring request")
+            return mBluetoothGatt
+        }
+
+        // 기존 연결이 있으면 먼저 정리
+        if (mBluetoothGatt != null) {
+            AppLogger.d(TAG, "Cleaning up existing Gatt connection before new connection")
+            disconnectGattServer()
+        }
+
         this.mBluetoothDevice = device
+        isConnecting.set(true)
+        isConnected.set(false)
+
+        AppLogger.logBleConnection(TAG, device.address, "Connecting")
+
+        // 연결 타임아웃 설정
+        startConnectionTimeout()
 
         mBluetoothGatt = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             device.connectGatt(
@@ -236,17 +310,98 @@ class BLEController(
         } else {
             device.connectGatt(mContext, false, mGattCallback)
         }
+
+        if (mBluetoothGatt == null) {
+            AppLogger.e(TAG, "Failed to create Gatt connection")
+            isConnecting.set(false)
+            cancelConnectionTimeout()
+        }
+
         return mBluetoothGatt
     }
 
     @SuppressLint("MissingPermission")
-    private fun disconnectGattServer() {
-        Log.d(TAG, "Closing Gatt connection")
-        // disconnect and close the gatt
-        if (mBluetoothGatt != null) {
-            mBluetoothGatt?.disconnect()
-            mBluetoothGatt?.close()
+    fun disconnectGattServer() {
+        AppLogger.d(TAG, "Disconnecting Gatt connection")
+
+        // 타임아웃 취소
+        cancelConnectionTimeout()
+
+        // 상태 업데이트
+        isConnecting.set(false)
+        isConnected.set(false)
+
+        // GATT 연결 해제
+        try {
+            mBluetoothGatt?.let { gatt ->
+                // Notification 비활성화
+                try {
+                    gatt.services?.forEach { service ->
+                        service.characteristics?.forEach { characteristic ->
+                            if (characteristic.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0) {
+                                gatt.setCharacteristicNotification(characteristic, false)
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    AppLogger.logException(TAG, "Error disabling notifications", e)
+                }
+
+                // 연결 해제 및 리소스 정리
+                gatt.disconnect()
+                // disconnect 후 약간의 지연을 두고 close (안정성 향상)
+                handler.postDelayed({
+                    try {
+                        gatt.close()
+                        AppLogger.d(TAG, "Gatt connection closed successfully")
+                    } catch (e: Exception) {
+                        AppLogger.logException(TAG, "Error closing Gatt", e)
+                    }
+                }, 300)
+            }
+        } catch (e: Exception) {
+            AppLogger.logException(TAG, "Error during Gatt disconnect", e)
+        } finally {
             mBluetoothGatt = null
+            mBluetoothDevice = null
+
+            // 서비스 정보 정리
+            services.clear()
+            characMap.clear()
+        }
+    }
+
+    /**
+     * 연결 타임아웃 시작
+     */
+    private fun startConnectionTimeout() {
+        cancelConnectionTimeout()
+
+        connectionTimeoutRunnable = Runnable {
+            if (isConnecting.get() && !isConnected.get()) {
+                AppLogger.w(TAG, "Connection timeout - disconnecting")
+                CoroutineScope(Dispatchers.Main).launch {
+                    mContext?.let {
+                        Toast.makeText(it, com.kyutae.applicationtest.R.string.error_connection_timeout, Toast.LENGTH_SHORT).show()
+                    }
+                    disconnectGattServer()
+                    gattConnect.value = false
+                }
+            }
+        }
+
+        connectionTimeoutRunnable?.let {
+            handler.postDelayed(it, CONNECTION_TIMEOUT_MS)
+        }
+    }
+
+    /**
+     * 연결 타임아웃 취소
+     */
+    private fun cancelConnectionTimeout() {
+        connectionTimeoutRunnable?.let {
+            handler.removeCallbacks(it)
+            connectionTimeoutRunnable = null
         }
     }
 

@@ -113,9 +113,9 @@ class MainFragment : Fragment() {
             ) { newSettings ->
                 viewModel.updateFilterSettings(newSettings)
                 if (newSettings.hasActiveFilters()) {
-                    Toast.makeText(requireContext(), "필터가 적용되었습니다", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), R.string.filter_applied, Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(requireContext(), "필터가 해제되었습니다", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), R.string.filter_cleared, Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -239,7 +239,7 @@ class MainFragment : Fragment() {
      * 장치 개수 표시
      */
     private fun updateDeviceCount(count: Int) {
-        bind.deviceCountText.text = "장치: ${count}개"
+        bind.deviceCountText.text = getString(R.string.device_count, count)
     }
 
     /**
@@ -253,17 +253,17 @@ class MainFragment : Fragment() {
             when (menuItem.itemId) {
                 R.id.sort_by_rssi -> {
                     viewModel.setSortType(SortType.RSSI)
-                    Toast.makeText(requireContext(), "신호 강도순 정렬", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), R.string.sorted_by_rssi, Toast.LENGTH_SHORT).show()
                     true
                 }
                 R.id.sort_by_name -> {
                     viewModel.setSortType(SortType.NAME)
-                    Toast.makeText(requireContext(), "이름순 정렬", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), R.string.sorted_by_name, Toast.LENGTH_SHORT).show()
                     true
                 }
                 R.id.sort_by_address -> {
                     viewModel.setSortType(SortType.ADDRESS)
-                    Toast.makeText(requireContext(), "주소순 정렬", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), R.string.sorted_by_address, Toast.LENGTH_SHORT).show()
                     true
                 }
                 else -> false

@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/nanum_square_extrabold"
             android:includeFontPadding="false"
-            android:text="알림"
+            android:text="@string/dialog_notification"
             android:textColor="@color/black"
             android:textSize="28dp" />
 
@@ -30,7 +30,7 @@
             android:layout_marginTop="8dp"
             android:fontFamily="@font/nanum_square_bold"
             android:includeFontPadding="false"
-            android:text="근처 기기 액세스 권한을 허용해주세요."
+            android:text="@string/dialog_nearby_device_permission"
             android:textColor="@color/black"
             android:textSize="20dp" />
 
@@ -43,7 +43,7 @@
             android:layout_marginTop="16dp"
             android:fontFamily="@font/nanum_square_regular"
             android:includeFontPadding="false"
-            android:text="확인"
+            android:text="@string/dialog_ok"
             android:textColor="@color/white"
             android:textSize="20dp" />
 

@@ -94,9 +94,9 @@ object AutoReconnectManager {
                 return Result.success()
             }
 
-            // TODO: 실제 BLE 재연결 로직 구현
-            // 여기서는 알림만 표시하거나 이벤트 발생
-            // BLEController를 통해 재연결 시도
+            // 재연결 알림 표시
+            // 사용자가 알림을 클릭하면 MainActivity가 열리고 재연결 시도
+            BleNotificationManager.showReconnectNotification(applicationContext, deviceAddress)
 
             return Result.success()
         }

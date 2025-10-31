@@ -14,11 +14,13 @@
     <string name="device_details">장치 상세정보</string>
 
     <!-- UI Text -->
+    <string name="title_ble_scan">BLE 장치 스캔</string>
     <string name="scanning">스캔 중...</string>
     <string name="no_devices_found">장치를 찾을 수 없습니다</string>
     <string name="connecting">연결 중...</string>
     <string name="connected">연결됨</string>
     <string name="disconnected">연결 끊김</string>
+    <string name="empty_scan_description">스캔 버튼을 눌러 주변 장치를 검색하세요</string>
 
     <!-- Error Messages -->
     <string name="error_bluetooth_not_supported">이 기기는 블루투스를 지원하지 않습니다</string>
@@ -33,4 +35,148 @@
 
     <!-- Test AdMob IDs (for development) -->
     <string name="admob_test_interstitial_id">ca-app-pub-3940256099942544/1033173712</string>
+
+    <!-- Additional UI Strings -->
+    <string name="device_name">장치 이름</string>
+    <string name="device_address">MAC 주소</string>
+    <string name="signal_strength">신호 강도</string>
+    <string name="device_type">장치 유형</string>
+    <string name="company">제조사</string>
+    <string name="service_uuid">서비스 UUID</string>
+    <string name="service_data">서비스 데이터</string>
+    <string name="mac_address">MAC 주소</string>
+    <string name="rssi_signal_strength">RSSI (신호 세기)</string>
+    <string name="service_uuid_label">서비스 UUID</string>
+    <string name="no_data">데이터 없음</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="content_desc_device_name">장치 이름</string>
+    <string name="content_desc_address">주소</string>
+    <string name="content_desc_device_type">장치 유형</string>
+    <string name="content_desc_signal_strength">신호 강도</string>
+    <string name="content_desc_manufacturer">제조사</string>
+
+    <!-- Device Info Screen -->
+    <string name="device_info">장치 정보</string>
+    <string name="device_detail_info">장치 상세 정보</string>
+    <string name="basic_info">기본 정보</string>
+    <string name="signal_and_manufacturer">신호 및 제조사</string>
+    <string name="connection_settings">연결 설정</string>
+    <string name="service_select_description">서비스를 선택하면 특성(Characteristics)을 확인할 수 있습니다</string>
+    <string name="auto_reconnect">자동 재연결</string>
+    <string name="auto_reconnect_description">연결이 끊어지면 자동으로 재연결을 시도합니다</string>
+    <string name="auto_reconnect_enabled">자동 재연결이 활성화되었습니다</string>
+    <string name="auto_reconnect_disabled">자동 재연결이 비활성화되었습니다</string>
+    <string name="device_info_not_available">장치 정보를 찾을 수 없습니다</string>
+
+    <!-- Connection States -->
+    <string name="state_connecting">연결 중...</string>
+    <string name="state_connected">연결됨</string>
+    <string name="state_disconnected">연결 끊김</string>
+    <string name="state_disconnecting">연결 해제 중...</string>
+
+    <!-- GATT Services -->
+    <string name="gatt_services">GATT 서비스</string>
+    <string name="gatt_services_characteristics">서비스 및 특성</string>
+    <string name="no_services_found">서비스를 찾을 수 없습니다</string>
+    <string name="discovering_services">서비스 검색 중...</string>
+    <string name="not_advertised">광고 패킷에 포함되지 않음</string>
+    <string name="service_not_advertised">이 장치는 서비스 UUID를 광고하지 않습니다.\nGATT 연결 후 서비스 목록에서 확인 가능합니다.</string>
+
+    <!-- Characteristic Operations -->
+    <string name="read">읽기</string>
+    <string name="write">쓰기</string>
+    <string name="notify">알림</string>
+    <string name="indicate">표시</string>
+    <string name="characteristic_value">값</string>
+    <string name="enter_value">값 입력</string>
+    <string name="write_success">쓰기 성공</string>
+    <string name="write_failed">쓰기 실패</string>
+    <string name="read_success">읽기 성공</string>
+    <string name="read_failed">읽기 실패</string>
+
+    <!-- Characteristic Detail -->
+    <string name="characteristic">특성</string>
+    <string name="expand">확장</string>
+    <string name="current_value">현재 값</string>
+    <string name="read_time">읽은 시간</string>
+    <string name="read_time_value">읽은 시간: %s</string>
+    <string name="read_time_none">읽은 시간: -</string>
+    <string name="subscribe">구독</string>
+    <string name="unsubscribe">구독 해제</string>
+    <string name="send">전송</string>
+    <string name="cancel">취소</string>
+    <string name="enter_value_hint">값 입력</string>
+    <string name="please_enter_value">값을 입력하세요</string>
+    <string name="data_sent">데이터 전송 완료</string>
+    <string name="input_format_error">입력 형식 오류: %s</string>
+    <string name="input_hint_hex">예: 01 02 03</string>
+    <string name="input_hint_decimal">예: 1 2 3</string>
+    <string name="input_hint_ascii">예: Hello</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">BLE 스캐너</string>
+    <string name="notification_channel_description">BLE 장치 연결 및 스캔 알림</string>
+    <string name="notification_device_found">새로운 BLE 장치 발견</string>
+    <string name="notification_reconnect">BLE 장치 재연결</string>
+    <string name="notification_reconnect_description">장치에 재연결을 시도합니다</string>
+    <string name="notification_action_reconnect">재연결</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_notification">알림</string>
+    <string name="dialog_bluetooth_required">블루투스 필요</string>
+    <string name="dialog_bluetooth_message">이 앱은 블루투스가 필요합니다. 블루투스를 활성화해주세요.</string>
+    <string name="dialog_permission_required">권한 필요</string>
+    <string name="dialog_permission_message">BLE 장치를 검색하려면 블루투스 및 위치 권한이 필요합니다.</string>
+    <string name="dialog_nearby_device_permission">근처 기기 액세스 권한을 허용해주세요.</string>
+    <string name="dialog_go_to_settings">설정으로 이동</string>
+    <string name="dialog_cancel">취소</string>
+    <string name="dialog_ok">확인</string>
+
+    <!-- Filter and Sort -->
+    <string name="filter">필터</string>
+    <string name="filter_devices">장치 필터</string>
+    <string name="filter_scan">스캔 필터</string>
+    <string name="filter_applied">필터가 적용되었습니다</string>
+    <string name="filter_cleared">필터가 해제되었습니다</string>
+    <string name="filter_name_hint">이름 입력 (부분 일치)</string>
+    <string name="filter_uuid_hint">UUID 입력 (부분 일치)</string>
+    <string name="filter_min_rssi">최소 신호 강도 (RSSI)</string>
+    <string name="filter_connectable_only">연결 가능한 장치만 표시</string>
+    <string name="filter_reset">초기화</string>
+    <string name="filter_apply">적용</string>
+    <string name="sort_by_rssi">신호 강도순 정렬</string>
+    <string name="sort_by_name">이름순 정렬</string>
+    <string name="sort_by_address">주소순 정렬</string>
+    <string name="sorted_by_rssi">신호 강도순 정렬</string>
+    <string name="sorted_by_name">이름순 정렬</string>
+    <string name="sorted_by_address">주소순 정렬</string>
+
+    <!-- Device Count -->
+    <string name="device_count">장치: %d개</string>
+    <string name="devices_found">%d개 장치 발견</string>
+
+    <!-- Empty States -->
+    <string name="empty_scan_title">장치를 찾을 수 없습니다</string>
+    <string name="empty_scan_message">아래로 당겨서 주변 BLE 장치를 검색하세요</string>
+    <string name="empty_scan_action">스캔 시작</string>
+
+    <!-- Errors -->
+    <string name="error_connection_timeout">연결 시간 초과</string>
+    <string name="error_device_not_found">장치를 찾을 수 없습니다</string>
+    <string name="error_invalid_address">잘못된 장치 주소입니다</string>
+    <string name="error_service_discovery_failed">서비스 검색 실패</string>
+    <string name="error_gatt_error">GATT 오류: %d</string>
+
+    <!-- Toast Messages -->
+    <string name="toast_scanning_started">스캔 시작됨</string>
+    <string name="toast_scanning_stopped">스캔 중지됨</string>
+    <string name="toast_reconnecting">재연결 시도 중...</string>
+    <string name="toast_connection_lost">연결이 끊어졌습니다</string>
+
+    <!-- Menu Items -->
+    <string name="menu_clear_filter">필터 해제</string>
+    <string name="menu_export_data">데이터 내보내기</string>
+    <string name="menu_settings">설정</string>
+    <string name="menu_about">정보</string>
 </resources>

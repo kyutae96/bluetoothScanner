@@ -37,7 +37,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="장치 상세 정보"
+                android:text="@string/device_detail_info"
                 android:fontFamily="@font/nanum_square_bold"
                 android:textColor="@color/black"
                 android:textSize="20sp"
@@ -65,7 +65,7 @@
                     android:id="@+id/connection_status_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="연결 중..."
+                    android:text="@string/state_connecting"
                     android:textSize="13sp"
                     android:textColor="@color/gray"
                     android:fontFamily="@font/nanum_square_bold" />
@@ -108,7 +108,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="기본 정보"
+                        android:text="@string/basic_info"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="@color/black"
@@ -128,7 +128,7 @@
                             android:layout_height="24dp"
                             android:src="@drawable/baseline_bluetooth_24"
                             android:tint="@color/primary"
-                            android:contentDescription="이름"
+                            android:contentDescription="@string/content_desc_device_name"
                             android:layout_marginEnd="12dp"/>
 
                         <LinearLayout
@@ -140,7 +140,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="장치 이름"
+                                android:text="@string/device_name"
                                 android:textSize="12sp"
                                 android:textColor="@color/gray"
                                 android:fontFamily="@font/nanum_square_bold"/>
@@ -178,7 +178,7 @@
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_mylocation"
                             android:tint="@color/primary"
-                            android:contentDescription="주소"
+                            android:contentDescription="@string/content_desc_address"
                             android:layout_marginEnd="12dp"/>
 
                         <LinearLayout
@@ -190,7 +190,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="MAC 주소"
+                                android:text="@string/mac_address"
                                 android:textSize="12sp"
                                 android:textColor="@color/gray"
                                 android:fontFamily="@font/nanum_square_bold"/>
@@ -228,7 +228,7 @@
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_info_details"
                             android:tint="@color/primary"
-                            android:contentDescription="타입"
+                            android:contentDescription="@string/content_desc_device_type"
                             android:layout_marginEnd="12dp"/>
 
                         <LinearLayout
@@ -240,7 +240,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="장치 타입"
+                                android:text="@string/device_type"
                                 android:textSize="12sp"
                                 android:textColor="@color/gray"
                                 android:fontFamily="@font/nanum_square_bold"/>
@@ -281,7 +281,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="신호 및 제조사"
+                        android:text="@string/signal_and_manufacturer"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="@color/black"
@@ -301,7 +301,7 @@
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_compass"
                             android:tint="@color/primary"
-                            android:contentDescription="신호 강도"
+                            android:contentDescription="@string/content_desc_signal_strength"
                             android:layout_marginEnd="12dp"/>
 
                         <LinearLayout
@@ -313,7 +313,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="RSSI (신호 세기)"
+                                android:text="@string/rssi_signal_strength"
                                 android:textSize="12sp"
                                 android:textColor="@color/gray"
                                 android:fontFamily="@font/nanum_square_bold"/>
@@ -351,7 +351,7 @@
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_view"
                             android:tint="@color/primary"
-                            android:contentDescription="제조사"
+                            android:contentDescription="@string/content_desc_manufacturer"
                             android:layout_marginEnd="12dp"/>
 
                         <LinearLayout
@@ -363,7 +363,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="제조사"
+                                android:text="@string/company"
                                 android:textSize="12sp"
                                 android:textColor="@color/gray"
                                 android:fontFamily="@font/nanum_square_bold"/>
@@ -424,7 +424,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="서비스 UUID"
+                                android:text="@string/service_uuid_label"
                                 android:textSize="12sp"
                                 android:textColor="@color/gray"
                                 android:fontFamily="@font/nanum_square_bold"/>
@@ -433,7 +433,7 @@
                                 android:id="@+id/service_uuid_txt"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N/A"
+                                tools:text="N/A"
                                 android:textSize="14sp"
                                 android:textColor="@color/black"
                                 android:fontFamily="monospace"
@@ -467,6 +467,57 @@
                 android:layout_gravity="center"
                 android:layout_marginVertical="16dp"/>
 
+            <!-- 자동 재연결 설정 카드 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:contentPadding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/auto_reconnect"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/nanum_square_bold"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/auto_reconnect_description"
+                            android:textSize="12sp"
+                            android:textColor="@color/gray"
+                            android:fontFamily="@font/nanum_square_bold"
+                            android:layout_marginTop="4dp"/>
+
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/auto_reconnect_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- GATT 서비스 및 특성 카드 -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/service_linear"
@@ -487,7 +538,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="GATT 서비스"
+                        android:text="@string/gatt_services"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="@color/black"
@@ -497,7 +548,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="서비스를 선택하면 특성(Characteristics)을 확인할 수 있습니다"
+                        android:text="@string/service_select_description"
                         android:textSize="12sp"
                         android:textColor="@color/gray"
                         android:layout_marginBottom="12dp"/>

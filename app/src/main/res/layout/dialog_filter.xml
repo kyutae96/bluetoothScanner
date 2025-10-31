@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="스캔 필터"
+            android:text="@string/filter_scan"
             android:textSize="20sp"
             android:textStyle="bold"
             android:paddingBottom="16dp"/>
@@ -23,14 +23,14 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="장치 이름"
+            android:text="@string/device_name"
             android:textSize="14sp"
             android:paddingBottom="8dp"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="이름 입력 (부분 일치)"
+            android:hint="@string/filter_name_hint"
             app:boxBackgroundMode="outline">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -44,7 +44,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="최소 신호 강도 (RSSI)"
+            android:text="@string/filter_min_rssi"
             android:textSize="14sp"
             android:paddingTop="16dp"
             android:paddingBottom="8dp"/>
@@ -77,7 +77,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="서비스 UUID"
+            android:text="@string/service_uuid"
             android:textSize="14sp"
             android:paddingTop="16dp"
             android:paddingBottom="8dp"/>
@@ -85,7 +85,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="UUID 입력 (부분 일치)"
+            android:hint="@string/filter_uuid_hint"
             app:boxBackgroundMode="outline">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -100,7 +100,7 @@
             android:id="@+id/filter_connectable_checkbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="연결 가능한 장치만 표시"
+            android:text="@string/filter_connectable_only"
             android:paddingTop="16dp"/>
 
         <!-- 버튼 -->
@@ -115,7 +115,7 @@
                 android:id="@+id/filter_reset_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="초기화"
+                android:text="@string/filter_reset"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_marginEnd="8dp"/>
 
@@ -123,7 +123,7 @@
                 android:id="@+id/filter_cancel_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="취소"
+                android:text="@string/dialog_cancel"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_marginEnd="8dp"/>
 
@@ -131,7 +131,7 @@
                 android:id="@+id/filter_apply_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="적용"/>
+                android:text="@string/filter_apply"/>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

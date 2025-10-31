@@ -34,7 +34,7 @@
                 android:layout_height="28dp"
                 android:src="@drawable/baseline_bubble_chart_24"
                 android:tint="@color/ewhamint"
-                android:contentDescription="특성"
+                android:contentDescription="@string/characteristic"
                 android:layout_marginEnd="12dp"
                 android:padding="2dp"/>
 
@@ -138,7 +138,7 @@
                 android:src="@drawable/ic_round_arrow_forward_ios_42"
                 android:rotation="90"
                 android:tint="@color/gray"
-                android:contentDescription="확장"/>
+                android:contentDescription="@string/expand"/>
 
         </LinearLayout>
 
@@ -173,7 +173,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="현재 값"
+                    android:text="@string/current_value"
                     android:textSize="11sp"
                     android:textColor="@color/gray"
                     android:fontFamily="@font/nanum_square_bold"/>
@@ -212,7 +212,7 @@
                     android:id="@+id/value_timestamp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="읽은 시간: -"
+                    android:text="@string/read_time_none"
                     android:textSize="10sp"
                     android:textColor="@color/gray"
                     android:layout_marginTop="4dp"/>
@@ -233,7 +233,7 @@
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:text="읽기"
+                    android:text="@string/read"
                     android:textSize="13sp"
                     app:icon="@android:drawable/ic_menu_view"
                     app:iconSize="18dp"
@@ -248,7 +248,7 @@
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:text="쓰기"
+                    android:text="@string/write"
                     android:textSize="13sp"
                     app:icon="@android:drawable/ic_menu_edit"
                     app:iconSize="18dp"
@@ -263,7 +263,7 @@
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:text="구독"
+                    android:text="@string/subscribe"
                     android:textSize="13sp"
                     app:icon="@android:drawable/ic_popup_reminder"
                     app:iconSize="18dp"
@@ -321,7 +321,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="값 입력"
+                    android:hint="@string/enter_value_hint"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -345,7 +345,7 @@
                         android:layout_width="0dp"
                         android:layout_height="48dp"
                         android:layout_weight="1"
-                        android:text="전송"
+                        android:text="@string/send"
                         android:backgroundTint="@color/primary"
                         android:layout_marginEnd="8dp"/>
 
@@ -355,7 +355,7 @@
                         android:layout_width="0dp"
                         android:layout_height="48dp"
                         android:layout_weight="1"
-                        android:text="취소"/>
+                        android:text="@string/cancel"/>
 
                 </LinearLayout>
 

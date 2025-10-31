@@ -198,7 +198,7 @@ class CharacteristicsAdapter(
             actionListener?.onNotifyCharacteristic(characteristic, notifyEnabled)
 
             // 버튼 상태 변경
-            holder.btnNotify.text = if (notifyEnabled) "구독 해제" else "구독"
+            holder.btnNotify.text = if (notifyEnabled) mContext.getString(R.string.unsubscribe) else mContext.getString(R.string.subscribe)
             holder.btnNotify.icon = if (notifyEnabled) {
                 mContext.getDrawable(android.R.drawable.ic_delete)
             } else {
@@ -213,7 +213,7 @@ class CharacteristicsAdapter(
         holder.btnSendWrite.setOnClickListener {
             val inputText = holder.inputValue.text.toString()
             if (inputText.isBlank()) {
-                Toast.makeText(mContext, "값을 입력하세요", Toast.LENGTH_SHORT).show()
+                Toast.makeText(mContext, R.string.please_enter_value, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -238,10 +238,10 @@ class CharacteristicsAdapter(
                 holder.writeInputLayout.visibility = View.GONE
                 holder.inputValue.text?.clear()
 
-                Toast.makeText(mContext, "데이터 전송 완료", Toast.LENGTH_SHORT).show()
+                Toast.makeText(mContext, R.string.data_sent, Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 Log.e(TAG, "Error parsing input: ${e.message}")
-                Toast.makeText(mContext, "입력 형식 오류: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(mContext, mContext.getString(R.string.input_format_error, e.message), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -305,15 +305,15 @@ class CharacteristicsAdapter(
             when (checkedId) {
                 R.id.btn_hex_input -> {
                     holder.inputValue.inputType = InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
-                    holder.inputValue.hint = "예: 01 02 03"
+                    holder.inputValue.hint = mContext.getString(R.string.input_hint_hex)
                 }
                 R.id.btn_decimal_input -> {
                     holder.inputValue.inputType = InputType.TYPE_CLASS_NUMBER
-                    holder.inputValue.hint = "예: 1 2 3"
+                    holder.inputValue.hint = mContext.getString(R.string.input_hint_decimal)
                 }
                 R.id.btn_ascii_input -> {
                     holder.inputValue.inputType = InputType.TYPE_CLASS_TEXT
-                    holder.inputValue.hint = "예: Hello"
+                    holder.inputValue.hint = mContext.getString(R.string.input_hint_ascii)
                 }
             }
         }
@@ -354,13 +354,13 @@ class CharacteristicsAdapter(
             // 시간 표시
             if (timestamp != null) {
                 val dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-                holder.valueTimestamp.text = "읽은 시간: ${dateFormat.format(Date(timestamp))}"
+                holder.valueTimestamp.text = mContext.getString(R.string.read_time_value, dateFormat.format(Date(timestamp)))
             }
         } else {
             holder.valueHex.text = "Hex: N/A"
             holder.valueDecimal.text = "Decimal: N/A"
             holder.valueAscii.text = "ASCII: N/A"
-            holder.valueTimestamp.text = "읽은 시간: -"
+            holder.valueTimestamp.text = mContext.getString(R.string.read_time_none)
         }
     }
 }

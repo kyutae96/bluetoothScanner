@@ -12,19 +12,43 @@ android {
         applicationId = "com.kyutae.applicationtest"
         minSdk = 24
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.0.4.1"
+        versionCode = 7
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // 벡터 드로어블 지원
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // ProGuard/R8 난독화 활성화
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            // 디버그 정보 제거
+            isDebuggable = false
+            isJniDebuggable = false
+
+            // 빌드 성능 최적화
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
+        }
+
+        debug {
+            // 디버그 빌드는 난독화 비활성화
+            isMinifyEnabled = false
+            isDebuggable = true
+
+            // 디버그용 애플리케이션 ID suffix
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
     }
     compileOptions {

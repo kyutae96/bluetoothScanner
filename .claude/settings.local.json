@@ -13,7 +13,9 @@
       "Bash(powershell -Command \"Get-ChildItem Env:JAVA_HOME\")",
       "Bash(powershell -Command \"Test-Path ''C:\\Program Files\\Android\\AndroidStudio\\jbr\\lib\\jvm.cfg''\")",
       "WebSearch",
-      "Bash(cmd /c \"cd /d C:\\Users\\bestb\\KyutaeApplication\\applicationtest && gradlew.bat assembleDebug\")"
+      "Bash(cmd /c \"cd /d C:\\Users\\bestb\\KyutaeApplication\\applicationtest && gradlew.bat assembleDebug\")",
+      "Bash(powershell -Command \"Get-Content ''C:\\Users\\bestb\\KyutaeApplication\\applicationtest\\app\\src\\main\\res\\layout\\fragment_setting.xml'' | Measure-Object -Line\")",
+      "Bash(powershell -Command \"cd ''C:\\Users\\bestb\\KyutaeApplication\\applicationtest''; .\\gradlew.bat assembleDebug\")"
     ],
     "deny": [],
     "ask": []
